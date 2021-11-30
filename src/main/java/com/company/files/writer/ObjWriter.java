@@ -1,4 +1,4 @@
-package com.company.writer;
+package com.company.files.writer;
 
 import com.company.Model;
 import com.company.Polygon;

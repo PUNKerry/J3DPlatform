@@ -1,4 +1,4 @@
-package com.company;
+package com.company.exceptions;
 
 public class ObjReaderException extends RuntimeException {
     public ObjReaderException(String errorMessage, int lineInd) {

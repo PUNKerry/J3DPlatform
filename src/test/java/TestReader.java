@@ -1,5 +1,5 @@
 import com.company.Model;
-import com.company.ObjReader;
+import com.company.files.reader.ObjReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

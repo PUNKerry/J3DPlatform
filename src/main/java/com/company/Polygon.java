@@ -26,8 +26,8 @@ public class Polygon {
     }
 
     public void addNewVertex(final int indexV,
-                             final int indexVt,     // 0 - если не указано
-                             final int indexVn)     // 0 - если не указано
+                             final int indexVt,     // -1 - если не указано
+                             final int indexVn)     // -1 - если не указано
             throws Exception {
         if (indicesVertexes.size() == 0) {
             if (indexVt != -1) {

@@ -1,4 +1,7 @@
-package com.company;
+package com.company.files.reader;
+
+import com.company.*;
+import com.company.exceptions.ObjReaderException;
 
 import java.util.*;
 

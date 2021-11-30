@@ -1,6 +1,7 @@
 package com.company;
 
-import java.io.IOException;
+import com.company.files.reader.ObjReader;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
