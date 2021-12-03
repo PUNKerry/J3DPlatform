@@ -1,5 +1,5 @@
 import com.company.Model;
-import com.company.files.reader.ObjReader;
+import com.company.files.obj.ObjReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ public class TestReader {
                 vn 4.721225 1.69754 4.5
                 f  1/2/5 1/2/3 1/2/3""";
         try {
-            Model m = ObjReader.read(s);
+            Model m1 = ObjReader.read(s);
         } catch (Exception exception) {
             String expectedError = "Error parsing OBJ file on line: 10. the index of the N vertex exceeding their number is specified";
             Assertions.assertEquals(expectedError, exception.getMessage());

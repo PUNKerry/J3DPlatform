@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.files.reader.ObjReader;
+import com.company.files.obj.ObjReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

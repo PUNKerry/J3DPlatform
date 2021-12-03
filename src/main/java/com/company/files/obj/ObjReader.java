@@ -1,4 +1,4 @@
-package com.company.files.reader;
+package com.company.files.obj;
 
 import com.company.*;
 import com.company.exceptions.ObjReaderException;
@@ -6,11 +6,6 @@ import com.company.exceptions.ObjReaderException;
 import java.util.*;
 
 public class ObjReader {
-
-    private static final String OBJ_VERTEX_TOKEN = "v";
-    private static final String OBJ_TEXTURE_TOKEN = "vt";
-    private static final String OBJ_NORMAL_TOKEN = "vn";
-    private static final String OBJ_FACE_TOKEN = "f";
 
     public static Model read(String fileContent) throws Exception {
         Model result = new Model();
@@ -29,26 +24,27 @@ public class ObjReader {
 
             final String token = wordsInLine.get(0);
             wordsInLine.remove(0);
-            if (Objects.equals(token, OBJ_TEXTURE_TOKEN) || Objects.equals(token, OBJ_NORMAL_TOKEN) || Objects.equals(token, OBJ_VERTEX_TOKEN)){
+            if (Objects.equals(token, ObjTokens.TEXTURE) || Objects.equals(token, ObjTokens.NORMAL) ||
+                    Objects.equals(token, ObjTokens.VERTEX)){
                 if (wordsInLine.size() > 3) {
                     throw new ObjReaderException("Too many numbers.", lineInd);
                 }
             }
             ++lineInd;
             switch (token) {
-                case OBJ_VERTEX_TOKEN -> {
+                case ObjTokens.VERTEX -> {
                     result.addNewVertex(parseVertex(wordsInLine, lineInd));
                     quantityVertex++;
                 }
-                case OBJ_TEXTURE_TOKEN -> {
+                case ObjTokens.TEXTURE -> {
                     result.addNewTextureVertex(parseTextureVertex(wordsInLine, lineInd));
                     quantityTexture++;
                 }
-                case OBJ_NORMAL_TOKEN -> {
+                case ObjTokens.NORMAL -> {
                     result.addNewNormal(parseNormal(wordsInLine, lineInd));
                     quantityNormal++;
                 }
-                case OBJ_FACE_TOKEN -> result.addNewPolygon(parseFace(
+                case ObjTokens.POLYGON -> result.addNewPolygon(parseFace(
                         wordsInLine,
                         lineInd,
                         quantityTexture,
