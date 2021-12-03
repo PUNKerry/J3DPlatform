@@ -1,5 +1,6 @@
 package com.company.engine;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
@@ -41,18 +42,40 @@ public class Camera {
     }
 
     public void movePosition(final Vector3f translation) {
+
         this.position.add(translation);
     }
 
-    public void moveTarget(final Vector3f translation) {
-        this.target.add(target);
+    public void movePosition(final Direction direction,
+                             final float ratio) {
+        int i = -1;
+        switch (direction) {
+            case FORWARD, BACK -> {
+                i = 2;
+            }
+            case LEFT, RIGHT -> {
+                i = 0;
+            }
+            case UP, DOWN-> {
+                i = 1;
+            }
+        }
+        Matrix3f m = new Matrix3f();
+        getViewMatrix().get(m);
+        Vector3f v = new Vector3f();
+        m.getColumn(i, v);
+        position.add(new Vector3f(v.x * ratio, v.y * ratio, v.z * ratio));
     }
 
-    Matrix4f getViewMatrix() {
+    public void moveTarget(final Vector3f translation) {
+        this.target.add(translation);
+    }
+
+    public Matrix4f getViewMatrix() {
         return GraphicConveyor.lookAt(position, target);
     }
 
-    Matrix4f getProjectionMatrix() {
+    public Matrix4f getProjectionMatrix() {
         return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 

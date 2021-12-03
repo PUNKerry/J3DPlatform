@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.base.Model;
+import com.company.engine.Direction;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
@@ -19,11 +20,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
+import java.util.Date;
 import javax.vecmath.Vector3f;
 
 public class GuiController {
 
-    final private float TRANSLATION = 0.5F;
+    private static final float DEFAULT_TRANSLATION = 0.5F;
+
+    private float translation = DEFAULT_TRANSLATION;
 
     @FXML
     AnchorPane anchorPane;
@@ -107,33 +111,94 @@ public class GuiController {
         }
     }
 
+    private long lastEventTime = 0;
+    private Direction lastEventDirection = Direction.FORWARD;
+    private boolean cameraMoved = true;
+
+    private void changeTranslation(Direction direction) {
+        long now = new Date().getTime();
+        if (direction == lastEventDirection && now - lastEventTime < 75) {
+            increaseTranslation();
+        } else {
+            translation = DEFAULT_TRANSLATION;
+        }
+        lastEventDirection = direction;
+        lastEventTime = now;
+    }
+
+    private void increaseTranslation() {
+        if (translation < DEFAULT_TRANSLATION * 20) {
+            translation += 2 * DEFAULT_TRANSLATION;
+        }
+    }
+
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
+        Direction nowDirection = Direction.FORWARD;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, TRANSLATION));
+        Direction nowDirection = Direction.BACK;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(TRANSLATION, 0, 0));
+        Direction nowDirection = Direction.LEFT;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0));
+        Direction nowDirection = Direction.RIGHT;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, TRANSLATION, 0));
+        Direction nowDirection = Direction.UP;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
+        Direction nowDirection = Direction.DOWN;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
+    }
+
+    @FXML
+    public void viewPointUp(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.UP;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3f(0F, translation, 0F));
+    }
+
+    @FXML
+    public void viewPointDown(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.DOWN;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3f(0F, -translation, 0F));
+    }
+
+    @FXML
+    public void viewPointLeft(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.LEFT;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3f(translation, 0F , 0F));
+    }
+
+    @FXML
+    public void viewPointRight(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.RIGHT;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3f(-translation, 0F , 0F));
     }
 }
