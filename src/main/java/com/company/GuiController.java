@@ -81,6 +81,7 @@ public class GuiController {
             String fileContent = Files.readString(fileName);
             model = ObjReader.read(fileContent);
             // todo: обработка ошибок
+            ////
         } catch (IOException exception) {
         } catch (Exception e) {
             e.printStackTrace();
