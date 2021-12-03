@@ -1,11 +1,11 @@
-import com.company.Model;
-import com.company.Polygon;
-import com.company.Vector2f;
-import com.company.Vector3f;
+import com.company.base.Model;
+import com.company.base.Polygon;
 import com.company.files.obj.ObjWriter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 

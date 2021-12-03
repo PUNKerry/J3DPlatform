@@ -1,12 +1,12 @@
 package com.company.files.obj;
 
-import com.company.Model;
-import com.company.Polygon;
-import com.company.Vector2f;
-import com.company.Vector3f;
+import com.company.base.Model;
+import com.company.base.Polygon;
 import com.company.exceptions.ObjWriterException;
 
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -102,14 +102,14 @@ public class ObjWriter {
 
         for (int vertexIndex = 0; vertexIndex < polygon.countOfVertices(); vertexIndex++) {
             StringBuilder vertexSB = new StringBuilder();
-            vertexSB.append(polygon.getVertexIndex(vertexIndex));
+            vertexSB.append(polygon.getVertexIndex(vertexIndex) + 1);
             if (polygon.isTexturesExists()) {
-                vertexSB.append("/" + polygon.getTextureVertexIndex(vertexIndex));
+                vertexSB.append("/" + (polygon.getTextureVertexIndex(vertexIndex) + 1));
             } else if (polygon.isNormalsExists()) {
                 vertexSB.append("/");
             }
             if (polygon.isNormalsExists()) {
-                vertexSB.append("/" + polygon.getNormalIndex(vertexIndex));
+                vertexSB.append("/" + (polygon.getNormalIndex(vertexIndex) + 1));
             }
             if (vertexIndex > 0) {
                 line.append(" ");
