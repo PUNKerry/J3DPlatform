@@ -2,6 +2,10 @@ package com.company.files.obj;
 
 public class ObjTokens {
 
+    private ObjTokens() {
+
+    }
+
     public static final String VERTEX = "v";
     public static final String TEXTURE = "vt";
     public static final String NORMAL = "vn";
