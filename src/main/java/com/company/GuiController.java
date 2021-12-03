@@ -10,8 +10,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -81,10 +87,10 @@ public class GuiController {
             String fileContent = Files.readString(fileName);
             model = ObjReader.read(fileContent);
             // todo: обработка ошибок
-            ////
         } catch (IOException exception) {
+            handle(exception);
         } catch (Exception e) {
-            e.printStackTrace();
+            handle(e);
         }
     }
 
@@ -101,14 +107,39 @@ public class GuiController {
 
         try {
             ObjWriter.writeToFile(file, model);
-            // todo: обработка ошибок
         } catch (IOException exception) {
+            handle(exception);
         } catch (Exception e) {
-            e.printStackTrace();
+            handle(e);
         }
     }
 
-    @FXML
+    public void handle(Exception exception) {
+
+        Label label = new Label("       " + exception.getMessage() + "      ");
+        label.setFont(new Font(20));
+        label.setMinSize(100, 70);
+
+        StackPane pane = new StackPane();
+        pane.getChildren().add(label);
+
+        Scene scene = new Scene(pane);
+
+        Stage newWindow = new Stage();
+        newWindow.setTitle("Ошибка");
+        newWindow.setScene(scene);
+        newWindow.sizeToScene();
+        newWindow.setResizable(false);
+
+        newWindow.initModality(Modality.WINDOW_MODAL);
+
+        newWindow.setX(1000);
+        newWindow.setY(700);
+
+        newWindow.show();
+    }
+
+        @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
     }
