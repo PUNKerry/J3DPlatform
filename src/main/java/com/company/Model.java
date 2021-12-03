@@ -6,6 +6,7 @@ import com.company.exceptions.ModelException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Model {
 
@@ -96,31 +97,17 @@ public class Model {
     public Polygon getPolygon(final int index) {
         return polygons.get(index);
     }
-}
 
-//package com.company;
-//
-//
-//import java.util.*;
-//
-//public class Model {
-//
-//    public Model() {
-//        vertices = new ArrayList<Vector3f>();
-//        textureVertices = new ArrayList<Vector2f>();
-//        normals = new ArrayList<Vector3f>();
-//        polygonVertexIndices = new ArrayList<ArrayList<Integer>>();
-//        polygonTextureVertexIndices = new ArrayList<ArrayList<Integer>>();
-//        polygonNormalIndices = new ArrayList<ArrayList<Integer>>();
-//    }
-//
-//    ArrayList<Vector3f> vertices;
-//    ArrayList<Vector2f> textureVertices;
-//    ArrayList<Vector3f> normals;
-//
-//    // Каждый контейнер - список полигонов, где полигон описывается индексами вершин, текстурных вершин или нормалей.
-//    // Индексов для полигона может быть 3 (треугольник) и более.
-//    ArrayList<ArrayList<Integer>> polygonVertexIndices;
-//    ArrayList<ArrayList<Integer>> polygonTextureVertexIndices;
-//    ArrayList<ArrayList<Integer>> polygonNormalIndices;
-//}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Model model = (Model) o;
+        return texturesInPolygons == model.texturesInPolygons && normalsInPolygons == model.normalsInPolygons && Objects.equals(vertices, model.vertices) && Objects.equals(textureVertices, model.textureVertices) && Objects.equals(normals, model.normals) && Objects.equals(polygons, model.polygons);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vertices, textureVertices, normals, polygons, texturesInPolygons, normalsInPolygons);
+    }
+}

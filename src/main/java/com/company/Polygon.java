@@ -3,6 +3,7 @@ package com.company;
 import com.company.exceptions.PolygonException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Polygon {
 
@@ -69,5 +70,18 @@ public class Polygon {
 
     public int countOfVertices() {
         return indicesVertexes.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Polygon polygon = (Polygon) o;
+        return Objects.equals(indicesVertexes, polygon.indicesVertexes) && Objects.equals(indicesTextureVertexes, polygon.indicesTextureVertexes) && Objects.equals(indicesNormalVertexes, polygon.indicesNormalVertexes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(indicesVertexes, indicesTextureVertexes, indicesNormalVertexes);
     }
 }
