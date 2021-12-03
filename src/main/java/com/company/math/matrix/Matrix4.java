@@ -187,5 +187,12 @@ public class Matrix4 {
         return Arrays.deepHashCode(matrix);
     }
 
+    public double[] getVerticles(int index) {
+        double[] toReturn = new double[4];
+        for (int i = 0; i < 4; i++) {
+            toReturn[i] = matrix[i][index];
+        }
+        return toReturn;
+    }
 
 }

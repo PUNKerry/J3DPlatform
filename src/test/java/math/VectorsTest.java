@@ -1,3 +1,5 @@
+package math;
+
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
 import com.company.math.vector.Vector4;

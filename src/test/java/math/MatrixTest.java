@@ -1,3 +1,5 @@
+package math;
+
 import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
@@ -160,5 +162,9 @@ public class MatrixTest {
         Vector3 v = m.systemOfEquations(new Vector3(5,7,3));
         Vector3 res = new Vector3(1,2,1);
         Assertions.assertEquals(v, res);
+    }
+
+    @Test
+    public void name() {
     }
 }

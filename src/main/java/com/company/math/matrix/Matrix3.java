@@ -13,6 +13,15 @@ public class Matrix3 {
         }
     }
 
+    public double[] getVerticles(int index) {
+        double[] toReturn = new double[3];
+        for (int i = 0; i < 3; i++) {
+            toReturn[i] = matrix[i][index];
+        }
+
+        return toReturn;
+    }
+
     public Matrix3() {
         for (int i = 0; i < 3; i++) {
             Arrays.fill(matrix[i], 0);
