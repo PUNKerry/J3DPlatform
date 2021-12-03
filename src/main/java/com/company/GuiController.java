@@ -108,11 +108,6 @@ public class GuiController {
     }
 
     @FXML
-    public void getDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 1, -TRANSLATION));
-    }
-
-    @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
     }
