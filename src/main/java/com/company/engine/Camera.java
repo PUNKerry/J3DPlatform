@@ -1,7 +1,12 @@
 package com.company.engine;
 
+import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
+import com.company.math.vector.Vector4;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Vector3f;
 
 public class Camera {
 
@@ -40,12 +45,32 @@ public class Camera {
         return target;
     }
 
-    public void movePosition(final Vector3 translation) {
-        this.position.sum(translation);
+    public void movePosition(final Direction direction,
+                             final float ratio) {
+        int columnIndex = -1;
+        switch (direction) {
+            case FORWARD, BACK -> {
+                columnIndex = 2;
+            }
+            case LEFT, RIGHT -> {
+                columnIndex = 0;
+            }
+            case UP, DOWN-> {
+                columnIndex = 1;
+            }
+        }
+        Vector4 moving = getViewMatrix().getColumn(columnIndex);
+        /*
+        float range = (float) target.subtraction(position).length();
+        float dZ = ratio * ratio / (2 * range);
+        float dOther = ratio * (float) Math.sqrt(1 - dZ);
+        position = position.sum(new Vector3(moving.x * ratio * dOther, moving.y * ratio * dOther, dZ * Math.signum(ratio)));
+         */
+        position = position.sum(new Vector3(moving.x * ratio, moving.y * ratio, moving.z * ratio));
     }
 
     public void moveTarget(final Vector3 translation) {
-        this.target.sum(target);
+        target = target.sum(translation);
     }
 
     Matrix4 getViewMatrix() {

@@ -229,12 +229,8 @@ public class Matrix4 {
         return Arrays.deepHashCode(matrix);
     }
 
-    public double[] getVerticles(int index) {
-        double[] toReturn = new double[4];
-        for (int i = 0; i < 4; i++) {
-            toReturn[i] = matrix[i][index];
-        }
-        return toReturn;
+    public Vector4 getColumn(int index) {
+        return new Vector4(matrix[0][index], matrix[1][index], matrix[2][index], matrix[3][index]);
     }
 
 }

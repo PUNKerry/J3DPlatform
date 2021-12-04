@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.base.Model;
+import com.company.engine.Direction;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
@@ -11,17 +12,27 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.IOException;
 import java.io.File;
+import java.util.Date;
 
 public class GuiController {
 
-    final private float TRANSLATION = 0.5F;
+    private static final float DEFAULT_TRANSLATION = 0.5F;
+
+    private float translation = DEFAULT_TRANSLATION;
 
     @FXML
     AnchorPane anchorPane;
@@ -31,18 +42,19 @@ public class GuiController {
 
     private Model model = null;
 
-    private final Camera camera = new Camera(
+    private Camera camera = new Camera(
             new Vector3(0, 0, 100),
             new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
-    private ActionEvent actionEvent;
+
+    private Timeline timeline;
 
     @FXML
     private void initialize() {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
-        Timeline timeline = new Timeline();
+        timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
@@ -67,7 +79,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Load Model");
 
-        File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
+        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -78,8 +90,8 @@ public class GuiController {
             String fileContent = Files.readString(fileName);
             model = ObjReader.read(fileContent);
             // todo: обработка ошибок
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            handle(e);
         }
     }
 
@@ -89,7 +101,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Save Model");
 
-        File file = fileChooser.showSaveDialog(canvas.getScene().getWindow());
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -97,44 +109,124 @@ public class GuiController {
         try {
             ObjWriter.writeToFile(file, model);
             // todo: обработка ошибок
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            handle(e);
+        }
+    }
+
+    public void handle(Exception exception) {
+
+        Label label = new Label("       " + exception.getMessage() + "      ");
+        label.setFont(new Font(20));
+        label.setMinSize(100, 70);
+
+        StackPane pane = new StackPane();
+        pane.getChildren().add(label);
+
+        Scene scene = new Scene(pane);
+
+        Stage newWindow = new Stage();
+        newWindow.setTitle("Ошибка");
+        newWindow.setScene(scene);
+        newWindow.sizeToScene();
+        newWindow.setResizable(false);
+
+        newWindow.initModality(Modality.WINDOW_MODAL);
+
+        newWindow.setX(1000);
+        newWindow.setY(700);
+
+        newWindow.show();
+    }
+
+    private long lastEventTime = 0;
+    private Direction lastEventDirection = Direction.FORWARD;
+    private boolean cameraMoved = true;
+
+    private void changeTranslation(Direction direction) {
+        long now = new Date().getTime();
+        if (direction == lastEventDirection && now - lastEventTime < 75) {
+            increaseTranslation();
+        } else {
+            translation = DEFAULT_TRANSLATION;
+        }
+        lastEventDirection = direction;
+        lastEventTime = now;
+    }
+
+    private void increaseTranslation() {
+        if (translation < DEFAULT_TRANSLATION * 20) {
+            translation += 2 * DEFAULT_TRANSLATION;
         }
     }
 
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(0, 0, -TRANSLATION));
+        Direction nowDirection = Direction.FORWARD;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(0, 0, TRANSLATION));
+        Direction nowDirection = Direction.BACK;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(TRANSLATION, 0, 0));
+        Direction nowDirection = Direction.LEFT;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(-TRANSLATION, 0, 0));
+        Direction nowDirection = Direction.RIGHT;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(0, TRANSLATION, 0));
+        Direction nowDirection = Direction.UP;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, translation);
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3(0, -TRANSLATION, 0));
+        Direction nowDirection = Direction.DOWN;
+        changeTranslation(nowDirection);
+        camera.movePosition(nowDirection, -translation);
+    }
+
+    @FXML
+    public void viewPointUp(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.UP;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3(0F, translation, 0F));
+    }
+
+    @FXML
+    public void viewPointDown(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.DOWN;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3(0F, -translation, 0F));
+    }
+
+    @FXML
+    public void viewPointLeft(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.LEFT;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3(translation, 0F , 0F));
+    }
+
+    @FXML
+    public void viewPointRight(ActionEvent actionEvent) {
+        Direction nowDirection = Direction.RIGHT;
+        changeTranslation(nowDirection);
+        camera.moveTarget(new Vector3(-translation, 0F , 0F));
     }
 }
