@@ -32,9 +32,8 @@ public class ObjWriter {
     }
 
     public static List<String> modelToObjLines(final Model model) {
-        List<String> lines = new ArrayList<>();
 
-        lines.addAll(verticesToObjLines(model));
+        List<String> lines = new ArrayList<>(verticesToObjLines(model));
 
         if (model.isTexturesInPolygons()) {
             lines.addAll(textureVerticesToObjLines(model));
@@ -104,12 +103,12 @@ public class ObjWriter {
             StringBuilder vertexSB = new StringBuilder();
             vertexSB.append(polygon.getVertexIndex(vertexIndex) + 1);
             if (polygon.isTexturesExists()) {
-                vertexSB.append("/" + (polygon.getTextureVertexIndex(vertexIndex) + 1));
+                vertexSB.append("/").append(polygon.getTextureVertexIndex(vertexIndex) + 1);
             } else if (polygon.isNormalsExists()) {
                 vertexSB.append("/");
             }
             if (polygon.isNormalsExists()) {
-                vertexSB.append("/" + (polygon.getNormalIndex(vertexIndex) + 1));
+                vertexSB.append("/").append(polygon.getNormalIndex(vertexIndex) + 1);
             }
             if (vertexIndex > 0) {
                 line.append(" ");
