@@ -2,6 +2,8 @@ package structures;
 
 import com.company.base.Model;
 import com.company.base.Polygon;
+import com.company.math.vector.Vector2;
+import com.company.math.vector.Vector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ public class ModelTest_JavaMath {
         Model testable = new Model();
         int count = 15;
         for (int i = 0; i < count; i++) {
-            testable.addNewNormal(new Vector3f());
+            testable.addNewNormal(new Vector3());
         }
         int result = testable.getCountOfNormals();
         Assertions.assertEquals(count, result);
@@ -25,7 +27,7 @@ public class ModelTest_JavaMath {
         Model testable = new Model();
         int count = 99999;
         for (int i = 0; i < count; i++) {
-            testable.addNewNormal(new Vector3f());
+            testable.addNewNormal(new Vector3());
         }
         Assertions.assertEquals(count, testable.getCountOfNormals());
     }
@@ -33,7 +35,7 @@ public class ModelTest_JavaMath {
     @Test
     void testAddNormalProcessSt3() {
         Model testable = new Model();
-        Vector3f testableVector = new Vector3f();
+        Vector3 testableVector = new Vector3();
         
         testableVector.x = 1;
         testableVector.y = 2;
@@ -53,7 +55,7 @@ public class ModelTest_JavaMath {
         Model testable = new Model();
         int count = 15;
         for (int i = 0; i < count; i++) {
-            testable.addNewTextureVertex(new Vector2f());
+            testable.addNewTextureVertex(new Vector2());
         }
         Assertions.assertEquals(count, testable.getCountOfTextureVertices());
     }
@@ -63,7 +65,7 @@ public class ModelTest_JavaMath {
         Model testable = new Model();
         int count = 9999;
         for (int i = 0; i < count; i++) {
-            testable.addNewTextureVertex(new Vector2f());
+            testable.addNewTextureVertex(new Vector2());
         }
         Assertions.assertEquals(count, testable.getCountOfTextureVertices());
     }
@@ -71,7 +73,7 @@ public class ModelTest_JavaMath {
     @Test
     void testAddTextureProcessSt3() {
         Model testable = new Model();
-        Vector2f testableVector = new Vector2f();
+        Vector2 testableVector = new Vector2();
 
         testableVector.x = 1;
         testableVector.y = 2;

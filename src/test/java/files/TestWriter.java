@@ -3,11 +3,12 @@ package files;
 import com.company.base.Model;
 import com.company.base.Polygon;
 import com.company.files.obj.ObjWriter;
+import com.company.math.vector.Vector2;
+import com.company.math.vector.Vector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.util.List;
 
 
@@ -15,46 +16,46 @@ public class TestWriter {
 
     @Test
     public void testWrite1() {
-        Vector3f v = new Vector3f(1, 3, 6);
+        Vector3 v = new Vector3(1, 3, 6);
         Assertions.assertEquals("v 1.0 3.0 6.0", ObjWriter.vertexToObjLine(v));
     }
 
     @Test
     public void testWrite2() {
-        Vector3f v = new Vector3f(0, 0, 0);
+        Vector3 v = new Vector3(0, 0, 0);
         Assertions.assertEquals("v 0.0 0.0 0.0", ObjWriter.vertexToObjLine(v));
     }
 
     @Test
     public void testWrite3() {
-        Vector2f v = new Vector2f(5, 2);
+        Vector2 v = new Vector2(5, 2);
         Assertions.assertEquals("vt 5.0 2.0", ObjWriter.textureVertexToObjLine(v));
     }
 
     @Test
     public void testWrite4() {
-        Vector2f v = new Vector2f(0, 0);
+        Vector2 v = new Vector2(0, 0);
         Assertions.assertEquals("vt 0.0 0.0", ObjWriter.textureVertexToObjLine(v));
     }
 
     @Test
     public void testWrite5() {
-        Vector3f v = new Vector3f(10, 9, 6);
+        Vector3 v = new Vector3(10, 9, 6);
         Assertions.assertEquals("vn 10.0 9.0 6.0", ObjWriter.normalToObjLine(v));
     }
 
     @Test
     public void testWrite6() {
-        Vector3f v = new Vector3f(0, 0, 0);
+        Vector3 v = new Vector3(0, 0, 0);
         Assertions.assertEquals("vn 0.0 0.0 0.0", ObjWriter.normalToObjLine(v));
     }
 
     @Test
     public void testWrite7() {
         Model model = new Model();
-        Vector3f v1 = new Vector3f(5, 3, 0);
-        Vector3f v2 = new Vector3f(4, 2, 1);
-        Vector3f v3 = new Vector3f(0, 0, 0);
+        Vector3 v1 = new Vector3(5, 3, 0);
+        Vector3 v2 = new Vector3(4, 2, 1);
+        Vector3 v3 = new Vector3(0, 0, 0);
         model.addNewVertex(v1);
         model.addNewVertex(v2);
         model.addNewVertex(v3);
@@ -66,9 +67,9 @@ public class TestWriter {
     @Test
     public void testWrite8() {
         Model model = new Model();
-        Vector2f v1 = new Vector2f(5, 3);
-        Vector2f v2 = new Vector2f(4, 2);
-        Vector2f v3 = new Vector2f(0, 0);
+        Vector2 v1 = new Vector2(5, 3);
+        Vector2 v2 = new Vector2(4, 2);
+        Vector2 v3 = new Vector2(0, 0);
         model.addNewTextureVertex(v1);
         model.addNewTextureVertex(v2);
         model.addNewTextureVertex(v3);
@@ -80,9 +81,9 @@ public class TestWriter {
     @Test
     public void testWrite9() {
         Model model = new Model();
-        Vector3f v1 = new Vector3f(5, 3, 0);
-        Vector3f v2 = new Vector3f(4, 2, 1);
-        Vector3f v3 = new Vector3f(0, 0, 0);
+        Vector3 v1 = new Vector3(5, 3, 0);
+        Vector3 v2 = new Vector3(4, 2, 1);
+        Vector3 v3 = new Vector3(0, 0, 0);
         model.addNewNormal(v1);
         model.addNewNormal(v2);
         model.addNewNormal(v3);

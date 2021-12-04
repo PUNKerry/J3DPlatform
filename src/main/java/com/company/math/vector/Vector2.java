@@ -11,6 +11,10 @@ public class Vector2 implements Vector<Vector2>{
         this.y = y;
     }
 
+    public Vector2() {
+
+    }
+
     public double length(){
         return Math.sqrt(x * x + y * y);
     }
