@@ -13,6 +13,15 @@ Release:
 Beta:
 -
 Alpha:
+0.7
++ first build of 3d renderer
+- exception handler
+- small fixes in math lib
+- math lib connected
+- removed java vecmath
+- small optimizations
+- new camera alghoritm
+
 0.6
 - added our math lib
 - new test package structure
