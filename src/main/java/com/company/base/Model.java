@@ -1,6 +1,8 @@
 package com.company.base;
 
 import com.company.exceptions.ModelException;
+import com.company.math.vector.Vector2;
+import com.company.math.vector.Vector3;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -10,20 +12,20 @@ import java.util.Objects;
 
 public class Model {
 
-    private final List<Vector3f> vertices = new ArrayList<>();
-    private final List<Vector2f> textureVertices = new ArrayList<>();
-    private final List<Vector3f> normals = new ArrayList<>();
+    private final List<Vector3> vertices = new ArrayList<>();
+    private final List<Vector2> textureVertices = new ArrayList<>();
+    private final List<Vector3> normals = new ArrayList<>();
 
     private final List<Polygon> polygons = new ArrayList<>();
 
     private boolean texturesInPolygons = false;
     private boolean normalsInPolygons = false;
 
-    public void addNewVertex(final Vector3f v) {
+    public void addNewVertex(final Vector3 v) {
         vertices.add(v);
     }
 
-    public Vector3f getVertex(final int index) {
+    public Vector3 getVertex(final int index) {
         return vertices.get(index);
     }
 
@@ -31,11 +33,11 @@ public class Model {
         return vertices.size();
     }
 
-    public void addNewTextureVertex(final Vector2f vt) {
+    public void addNewTextureVertex(final Vector2 vt) {
         textureVertices.add(vt);
     }
 
-    public Vector2f getTextureVertex(final int index) {
+    public Vector2 getTextureVertex(final int index) {
         return textureVertices.get(index);
     }
 
@@ -47,11 +49,11 @@ public class Model {
         return textureVertices.size();
     }
 
-    public void addNewNormal(final Vector3f vn) {
+    public void addNewNormal(final Vector3 vn) {
         normals.add(vn);
     }
 
-    public Vector3f getNormal(final int index) {
+    public Vector3 getNormal(final int index) {
         return normals.get(index);
     }
 

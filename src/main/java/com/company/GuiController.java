@@ -5,6 +5,7 @@ import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
 import com.company.files.obj.ObjWriter;
+import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -17,7 +18,6 @@ import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.File;
-import javax.vecmath.Vector3f;
 
 public class GuiController {
 
@@ -32,8 +32,8 @@ public class GuiController {
     private Model model = null;
 
     private final Camera camera = new Camera(
-            new Vector3f(0, 0, 100),
-            new Vector3f(0, 0, 0),
+            new Vector3(0, 0, 100),
+            new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
     private ActionEvent actionEvent;
 
@@ -105,36 +105,36 @@ public class GuiController {
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
+        camera.movePosition(new Vector3(0, 0, -TRANSLATION));
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(0, 0, TRANSLATION));
+        camera.movePosition(new Vector3(0, 0, TRANSLATION));
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(TRANSLATION, 0, 0));
+        camera.movePosition(new Vector3(TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0));
+        camera.movePosition(new Vector3(-TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(0, TRANSLATION, 0));
+        camera.movePosition(new Vector3(0, TRANSLATION, 0));
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
         this.actionEvent = actionEvent;
-        camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
+        camera.movePosition(new Vector3(0, -TRANSLATION, 0));
     }
 }

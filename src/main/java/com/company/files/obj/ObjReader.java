@@ -3,8 +3,9 @@ package com.company.files.obj;
 import com.company.base.Model;
 import com.company.base.Polygon;
 import com.company.exceptions.ObjReaderException;
+import com.company.math.vector.Vector2;
+import com.company.math.vector.Vector3;
 
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,9 +83,9 @@ public class ObjReader {
         return result;
     }
 
-    public static Vector3f parseVertex(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
+    public static Vector3 parseVertex(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
         try {
-            return new Vector3f(
+            return new Vector3(
                     Float.parseFloat(wordsInLineWithoutToken.get(0)),
                     Float.parseFloat(wordsInLineWithoutToken.get(1)),
                     Float.parseFloat(wordsInLineWithoutToken.get(2)));
@@ -97,9 +98,9 @@ public class ObjReader {
         }
     }
 
-    public static Vector2f parseTextureVertex(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
+    public static Vector2 parseTextureVertex(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
         try {
-            return new Vector2f(
+            return new Vector2(
                     Float.parseFloat(wordsInLineWithoutToken.get(0)),
                     Float.parseFloat(wordsInLineWithoutToken.get(1)));
 
@@ -111,9 +112,9 @@ public class ObjReader {
         }
     }
 
-    public static Vector3f parseNormal(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
+    public static Vector3 parseNormal(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
         try {
-            return new Vector3f(
+            return new Vector3(
                     Float.parseFloat(wordsInLineWithoutToken.get(0)),
                     Float.parseFloat(wordsInLineWithoutToken.get(1)),
                     Float.parseFloat(wordsInLineWithoutToken.get(2)));

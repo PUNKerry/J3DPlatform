@@ -2,6 +2,8 @@ package com.company.engine;
 
 import com.company.base.Model;
 import com.company.base.Polygon;
+import com.company.math.matrix.Matrix4;
+import com.company.math.vector.Vector3;
 import javafx.scene.canvas.GraphicsContext;
 
 import javax.vecmath.*;
@@ -19,11 +21,11 @@ public class RenderEngine {
             final int width,
             final int height)
     {
-        Matrix4f modelMatrix = rotateScaleTranslate();
-        Matrix4f viewMatrix = camera.getViewMatrix();
-        Matrix4f projectionMatrix = camera.getProjectionMatrix();
+        Matrix4 modelMatrix = rotateScaleTranslate();
+        Matrix4 viewMatrix = camera.getViewMatrix();
+        Matrix4 projectionMatrix = camera.getProjectionMatrix();
 
-        Matrix4f modelViewProjectionMatrix = new Matrix4f(modelMatrix);
+        Matrix4 modelViewProjectionMatrix = new Matrix4(modelMatrix);
         modelViewProjectionMatrix.mul(viewMatrix);
         modelViewProjectionMatrix.mul(projectionMatrix);
 
@@ -35,7 +37,7 @@ public class RenderEngine {
 
             List<Point2f> resultPoints = new ArrayList<>();
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-                Vector3f vertex = model.getVertex(polygon.getVertexIndex(vertexInPolygonInd));
+                Vector3 vertex = model.getVertex(polygon.getVertexIndex(vertexInPolygonInd));
                 Point2f resultPoint = vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height);
                 resultPoints.add(resultPoint);
             }

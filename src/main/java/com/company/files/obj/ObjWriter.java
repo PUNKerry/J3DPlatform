@@ -3,10 +3,10 @@ package com.company.files.obj;
 import com.company.base.Model;
 import com.company.base.Polygon;
 import com.company.exceptions.ObjWriterException;
+import com.company.math.vector.Vector2;
+import com.company.math.vector.Vector3;
 
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -51,39 +51,39 @@ public class ObjWriter {
     public static List<String> verticesToObjLines(final Model model) {
         List<String> lines = new ArrayList<>();
         for (int vertexNumber = 0; vertexNumber < model.getCountOfVertices(); vertexNumber++) {
-            Vector3f v = model.getVertex(vertexNumber);
+            Vector3 v = model.getVertex(vertexNumber);
             lines.add(vertexToObjLine(v));
         }
         return lines;
     }
 
-    public static String vertexToObjLine(final Vector3f v) {
+    public static String vertexToObjLine(final Vector3 v) {
         return ObjTokens.VERTEX + " " + v.x + " " + v.y + " " + v.z;
     }
 
     public static List<String> textureVerticesToObjLines(final Model model) {
         List<String> lines = new ArrayList<>();
         for (int vertexNumber = 0; vertexNumber < model.getCountOfTextureVertices(); vertexNumber++) {
-            Vector2f v = model.getTextureVertex(vertexNumber);
+            Vector2 v = model.getTextureVertex(vertexNumber);
             lines.add(textureVertexToObjLine(v));
         }
         return lines;
     }
 
-    public static String textureVertexToObjLine(final Vector2f v) {
+    public static String textureVertexToObjLine(final Vector2 v) {
         return ObjTokens.TEXTURE + " " + v.x + " " + v.y;
     }
 
     public static List<String> normalsToObjLines(final Model model) {
         List<String> lines = new ArrayList<>();
         for (int vertexNumber = 0; vertexNumber < model.getCountOfNormals(); vertexNumber++) {
-            Vector3f v = model.getNormal(vertexNumber);
+            Vector3 v = model.getNormal(vertexNumber);
             lines.add(normalToObjLine(v));
         }
         return lines;
     }
 
-    public static String normalToObjLine(final Vector3f v) {
+    public static String normalToObjLine(final Vector3 v) {
         return ObjTokens.NORMAL + " " + v.x + " " + v.y + " " + v.z;
     }
 
