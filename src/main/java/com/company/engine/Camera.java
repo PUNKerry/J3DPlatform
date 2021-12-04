@@ -3,9 +3,6 @@ package com.company.engine;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
-
 public class Camera {
 
     public Camera(
