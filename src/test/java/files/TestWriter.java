@@ -1,3 +1,5 @@
+package files;
+
 import com.company.base.Model;
 import com.company.base.Polygon;
 import com.company.files.obj.ObjWriter;

@@ -1,6 +1,5 @@
 package com.company.files.obj;
 
-import com.company.*;
 import com.company.base.Model;
 import com.company.base.Polygon;
 import com.company.exceptions.ObjReaderException;
@@ -144,9 +143,7 @@ public class ObjReader {
             maxVertexIndex = Math.max(maxVertexIndex, Integer.parseInt(wordIndices[0]) - 1);
             switch (wordIndices.length) {
                 case 1 -> result.addNewVertex(Integer.parseInt(wordIndices[0]) - 1, -1, -1);
-                case 2 -> {
-                    result.addNewVertex(Integer.parseInt(wordIndices[0]) - 1, Integer.parseInt(wordIndices[1]) - 1, -1);
-                }
+                case 2 -> result.addNewVertex(Integer.parseInt(wordIndices[0]) - 1, Integer.parseInt(wordIndices[1]) - 1, -1);
                 case 3 -> {
                     if (wordIndices[1].equals("")) {
                         result.addNewVertex(Integer.parseInt(wordIndices[0]) - 1, -1, Integer.parseInt(wordIndices[2]) - 1);
