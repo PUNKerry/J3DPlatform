@@ -75,6 +75,12 @@ public class Vector3 implements Vector<Vector3> {
         z *= k;
     }
 
+    public final void sub(Vector3 var1, Vector3 var2) {
+        this.x = var1.x - var2.x;
+        this.y = var1.y - var2.y;
+        this.z = var1.z - var2.z;
+    }
+
     public double scalarProduct(Vector3 v){
         return (x * v.x + y * v.y + z * v.z)/length()/v.length();
     }

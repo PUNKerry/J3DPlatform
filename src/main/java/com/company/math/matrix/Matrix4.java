@@ -2,6 +2,7 @@ package com.company.math.matrix;
 
 import com.company.math.vector.Vector4;
 
+import javax.vecmath.Matrix4f;
 import java.util.Arrays;
 
 public class Matrix4 {
@@ -20,6 +21,12 @@ public class Matrix4 {
     public Matrix4(double[][] m) {
         for (int i = 0; i < 4; i++) {
             matrix[i] = m[i].clone();
+        }
+    }
+
+    public Matrix4(Matrix4 matrix4) {
+        for (int i = 0; i < 4; i++) {
+            matrix[i] = matrix4.matrix[i].clone();
         }
     }
 
@@ -182,6 +189,41 @@ public class Matrix4 {
         return Arrays.deepEquals(matrix, matrix4.matrix);
     }
 
+    public final void mul(Matrix4 var1) {
+        float var2 = (float) (this.matrix[0][0] * var1.matrix[0][0] + this.matrix[0][1] * var1.matrix[1][0] + this.matrix[0][2] * var1.matrix[2][0] + this.matrix[0][3] * var1.matrix[3][0]);
+        float var3 = (float) (this.matrix[0][0] * var1.matrix[0][1] + this.matrix[0][1] * var1.matrix[1][1] + this.matrix[0][2] * var1.matrix[2][1] + this.matrix[0][3] * var1.matrix[3][1]);
+        float var4 = (float) (this.matrix[0][0] * var1.matrix[0][2] + this.matrix[0][1] * var1.matrix[1][2] + this.matrix[0][2] * var1.matrix[2][2] + this.matrix[0][3] * var1.matrix[3][2]);
+        float var5 = (float) (this.matrix[0][0] * var1.matrix[0][3] + this.matrix[0][1] * var1.matrix[1][3] + this.matrix[0][2] * var1.matrix[2][3] + this.matrix[0][3] * var1.matrix[3][3]);
+        float var6 = (float) (this.matrix[1][0] * var1.matrix[0][0] + this.matrix[1][1] * var1.matrix[1][0] + this.matrix[1][2] * var1.matrix[2][0] + this.matrix[1][3] * var1.matrix[3][0]);
+        float var7 = (float) (this.matrix[1][0] * var1.matrix[0][1] + this.matrix[1][1] * var1.matrix[1][1] + this.matrix[1][2] * var1.matrix[2][1] + this.matrix[1][3] * var1.matrix[3][1]);
+        float var8 = (float) (this.matrix[1][0] * var1.matrix[0][2] + this.matrix[1][1] * var1.matrix[1][2] + this.matrix[1][2] * var1.matrix[2][2] + this.matrix[1][3] * var1.matrix[3][2]);
+        float var9 = (float) (this.matrix[1][0] * var1.matrix[0][3] + this.matrix[1][1] * var1.matrix[1][3] + this.matrix[1][2] * var1.matrix[2][3] + this.matrix[1][3] * var1.matrix[3][3]);
+        float var10 = (float) (this.matrix[2][0] * var1.matrix[0][0] + this.matrix[2][1] * var1.matrix[1][0] + this.matrix[2][2] * var1.matrix[2][0] + this.matrix[2][3] * var1.matrix[3][0]);
+        float var11 = (float) (this.matrix[2][0] * var1.matrix[0][1] + this.matrix[2][1] * var1.matrix[1][1] + this.matrix[2][2] * var1.matrix[2][1] + this.matrix[2][3] * var1.matrix[3][1]);
+        float var12 = (float) (this.matrix[2][0] * var1.matrix[0][2] + this.matrix[2][1] * var1.matrix[1][2] + this.matrix[2][2] * var1.matrix[2][2] + this.matrix[2][3] * var1.matrix[3][2]);
+        float var13 = (float) (this.matrix[2][0] * var1.matrix[0][3] + this.matrix[2][1] * var1.matrix[1][3] + this.matrix[2][2] * var1.matrix[2][3] + this.matrix[2][3] * var1.matrix[3][3]);
+        float var14 = (float) (this.matrix[3][0] * var1.matrix[0][0] + this.matrix[3][1] * var1.matrix[1][0] + this.matrix[3][2] * var1.matrix[2][0] + this.matrix[3][3] * var1.matrix[3][0]);
+        float var15 = (float) (this.matrix[3][0] * var1.matrix[0][1] + this.matrix[3][1] * var1.matrix[1][1] + this.matrix[3][2] * var1.matrix[2][1] + this.matrix[3][3] * var1.matrix[3][1]);
+        float var16 = (float) (this.matrix[3][0] * var1.matrix[0][2] + this.matrix[3][1] * var1.matrix[1][2] + this.matrix[3][2] * var1.matrix[2][2] + this.matrix[3][3] * var1.matrix[3][2]);
+        float var17 = (float) (this.matrix[3][0] * var1.matrix[0][3] + this.matrix[3][1] * var1.matrix[1][3] + this.matrix[3][2] * var1.matrix[2][3] + this.matrix[3][3] * var1.matrix[3][3]);
+        this.matrix[0][0] = var2;
+        this.matrix[0][1] = var3;
+        this.matrix[0][2] = var4;
+        this.matrix[0][3] = var5;
+        this.matrix[1][0] = var6;
+        this.matrix[1][1] = var7;
+        this.matrix[1][2] = var8;
+        this.matrix[1][3] = var9;
+        this.matrix[2][0] = var10;
+        this.matrix[2][1] = var11;
+        this.matrix[2][2] = var12;
+        this.matrix[2][3] = var13;
+        this.matrix[3][0] = var14;
+        this.matrix[3][1] = var15;
+        this.matrix[3][2] = var16;
+        this.matrix[3][3] = var17;
+    }
+    
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(matrix);
