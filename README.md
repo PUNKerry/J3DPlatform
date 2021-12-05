@@ -21,6 +21,8 @@ Alpha:
 - removed java vecmath
 - small optimizations
 - new camera alghoritm
+- fullscreenmode
+- screen fixes
 
 0.6
 - added our math lib
