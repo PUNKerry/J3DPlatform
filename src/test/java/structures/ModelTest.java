@@ -7,10 +7,8 @@ import com.company.math.vector.Vector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 
-public class ModelTest_JavaMath {
+public class ModelTest {
     @Test
     void testAddNormalProcessSt1() {
         Model testable = new Model();

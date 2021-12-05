@@ -4,8 +4,6 @@ import com.company.exceptions.ModelException;
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

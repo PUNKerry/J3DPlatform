@@ -89,7 +89,6 @@ public class GuiController {
         try {
             String fileContent = Files.readString(fileName);
             model = ObjReader.read(fileContent);
-            // todo: обработка ошибок
         } catch (Exception e) {
             handle(e);
         }
@@ -108,7 +107,6 @@ public class GuiController {
 
         try {
             ObjWriter.writeToFile(file, model);
-            // todo: обработка ошибок
         } catch (Exception e) {
             handle(e);
         }

@@ -1,12 +1,8 @@
 package com.company.engine;
 
-import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
 import com.company.math.vector.Vector4;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Vector3f;
 
 public class Camera {
 
@@ -66,7 +62,9 @@ public class Camera {
         float dOther = ratio * (float) Math.sqrt(1 - dZ);
         position = position.sum(new Vector3(moving.x * ratio * dOther, moving.y * ratio * dOther, dZ * Math.signum(ratio)));
          */
-        position = position.sum(new Vector3(moving.x * ratio, moving.y * ratio, moving.z * ratio));
+        Vector3 addition = new Vector3(moving.x * ratio, moving.y * ratio, moving.z * ratio);
+        position = position.sum(addition);
+        target = target.sum(addition);
     }
 
     public void moveTarget(final Vector3 translation) {
