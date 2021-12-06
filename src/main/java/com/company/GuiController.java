@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
@@ -42,6 +43,7 @@ public class GuiController {
     private Canvas canvas;
 
     private Model model = null;
+    private Image texture = null;
 
     private final Camera camera = new Camera(
             new Vector3(0, 0, 100),
@@ -66,7 +68,7 @@ public class GuiController {
             camera.setAspectRatio((float) (width / height));
 
             if (model != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, texture, (int) width, (int) height);
             }
         });
 
@@ -90,6 +92,24 @@ public class GuiController {
         try {
             String fileContent = Files.readString(fileName);
             model = ObjReader.read(fileContent);
+        } catch (Exception e) {
+            handle(e);
+        }
+    }
+
+    @FXML
+    private void loadTextureOnClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpg)", "*.jpg"));
+        fileChooser.setTitle("Load Texture");
+
+        File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        try {
+            texture = new Image(file.toString());
         } catch (Exception e) {
             handle(e);
         }
