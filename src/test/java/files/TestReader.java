@@ -113,9 +113,9 @@ public class TestReader {
                 f  1/2/3 1/2/3 1/2/3""";
 
         Model m1 = ObjReader.read(s);
-        Path fileName = Path.of("src\\main\\resources\\ObjModels\\Test.obj");
-        //Model m2 = ObjReader.readFromFile(fileName);
-        Assertions.assertEquals(m1, m1);
+        Path fileName = Path.of("src\\main\\resources\\com\\company\\models\\Test.obj");
+        Model m2 = ObjReader.readFromFile(fileName);
+        Assertions.assertEquals(m1, m2);
     }
 
     @Test

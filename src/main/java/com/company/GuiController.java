@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.base.Model;
+import com.company.base.ModelChange;
 import com.company.engine.Direction;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
@@ -12,19 +13,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
 import java.io.File;
 import java.util.Date;
 
@@ -40,7 +36,7 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
-    private Model model = null;
+    private ModelChange model = null;
 
     private Camera camera = new Camera(
             new Vector3(0, 0, 100),
@@ -65,7 +61,11 @@ public class GuiController {
             camera.setAspectRatio((float) (width / height));
 
             if (model != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+                Model m;
+                if(model.getChangingModel() != null){
+                    m = model.getChangingModel();
+                }else m = model.getInitialModel();
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
             }
         });
 
@@ -88,7 +88,7 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            model = ObjReader.read(fileContent);
+            model = new ModelChange(ObjReader.read(fileContent));
         } catch (Exception e) {
             handle(e);
         }
@@ -106,35 +106,24 @@ public class GuiController {
         }
 
         try {
-            ObjWriter.writeToFile(file, model);
+            Model m;
+            if(model.getChangingModel() != null){
+                m = model.getChangingModel();
+            }else m = model.getInitialModel();
+            ObjWriter.writeToFile(file, m);
         } catch (Exception e) {
             handle(e);
         }
     }
 
     public void handle(Exception exception) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
-        Label label = new Label("       " + exception.getMessage() + "      ");
-        label.setFont(new Font(20));
-        label.setMinSize(100, 70);
+        alert.setTitle("Exception");
+        alert.setHeaderText(null);
+        alert.setContentText(exception.getMessage());
 
-        StackPane pane = new StackPane();
-        pane.getChildren().add(label);
-
-        Scene scene = new Scene(pane);
-
-        Stage newWindow = new Stage();
-        newWindow.setTitle("Ошибка");
-        newWindow.setScene(scene);
-        newWindow.sizeToScene();
-        newWindow.setResizable(false);
-
-        newWindow.initModality(Modality.WINDOW_MODAL);
-
-        newWindow.setX(1000);
-        newWindow.setY(700);
-
-        newWindow.show();
+        alert.showAndWait();
     }
 
     private long lastEventTime = 0;

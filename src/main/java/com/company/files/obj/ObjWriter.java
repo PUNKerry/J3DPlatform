@@ -19,7 +19,7 @@ public class ObjWriter {
                                    final Model model)
             throws ObjWriterException, FileNotFoundException {
         if (model == null) {
-            throw new ObjWriterException("Модели не существует");
+            throw new ObjWriterException("the model does not exist");
         }
 
         PrintStream out = new PrintStream(file);

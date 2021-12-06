@@ -2,10 +2,13 @@ package structures;
 
 import com.company.base.Model;
 import com.company.base.Polygon;
+import com.company.files.obj.ObjReader;
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
 
 
 public class ModelTest {
@@ -106,5 +109,29 @@ public class ModelTest {
         md.addNewPolygon(poly);
 
         Assertions.assertEquals(1, md.getCountOfPolygons());
+    }
+
+    @Test
+    void testClone() throws Exception {
+        String s = """
+                v 4.721225 1.69754 4.41113
+                vt 4.721225 1.69754 4
+                vn 4.721225 1.69754 4.5
+                v 4.721225 1.69754 4.41113
+                vt 4.721225 1.69754 4
+                vn 4.721225 1.69754 4.5
+                v 4.721225 1.69754 4.41113
+                vt 4.721225 1.69754 4
+                vn 4.721225 1.69754 4.5
+                f  1/2/3 1/2/3 1/2/3""";
+
+        Polygon poly = new Polygon();
+        poly.addNewVertex(1,1,1);
+        poly.addNewVertex(2,2,2);
+        poly.addNewVertex(3,3,3);
+        Model m1 = ObjReader.read(s);
+        Model m2 = m1.clone();
+        m2.addNewPolygon(poly);
+        Assertions.assertNotEquals(m1, m2);
     }
 }

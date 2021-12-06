@@ -10,11 +10,11 @@ import java.util.Objects;
 
 public class Model {
 
-    private final List<Vector3> vertices = new ArrayList<>();
-    private final List<Vector2> textureVertices = new ArrayList<>();
-    private final List<Vector3> normals = new ArrayList<>();
+    private List<Vector3> vertices = new ArrayList<>();
+    private List<Vector2> textureVertices = new ArrayList<>();
+    private List<Vector3> normals = new ArrayList<>();
 
-    private final List<Polygon> polygons = new ArrayList<>();
+    private List<Polygon> polygons = new ArrayList<>();
 
     private boolean texturesInPolygons = false;
     private boolean normalsInPolygons = false;
@@ -66,7 +66,7 @@ public class Model {
     public void addNewPolygon(final Polygon p) throws Exception {
 
         if (p.countOfVertices() < 3) {
-            throw new ModelException("Ошибка модели: добавляемый полигон не может содержать меньше 3 вершин");
+            throw new ModelException("Model error: The polygon being added cannot contain less than 3 vertices");
         }
 
         if (polygons.size() == 0) {
@@ -74,16 +74,16 @@ public class Model {
             normalsInPolygons = p.isNormalsExists();
         } else {
             if (texturesInPolygons && !p.isTexturesExists()) {
-                throw new ModelException("Ошибка модели: в полигоне не указаны текстурные координаты, хотя должны");
+                throw new ModelException("Model error: texture coordinates are not specified in the polygon, although they should");
             }
             if (!texturesInPolygons && p.isTexturesExists()) {
-                throw new ModelException("Ошибка модели: в полигоне не должны быть указаны текстурные координаты");
+                throw new ModelException("Model error: texture coordinates should not be specified in the polygon");
             }
             if (normalsInPolygons && !p.isNormalsExists()) {
-                throw new ModelException("Ошибка модели: в полигоне не указаны нормали, хотя должны");
+                throw new ModelException("Model error: normals are not specified in the polygon, although they should");
             }
             if (!normalsInPolygons && p.isNormalsExists()) {
-                throw new ModelException("Ошибка модели: в полигоне не должны быть указаны нормали");
+                throw new ModelException("Model error: normals should not be specified in the polygon");
             }
         }
 
@@ -109,5 +109,32 @@ public class Model {
     @Override
     public int hashCode() {
         return Objects.hash(vertices, textureVertices, normals, polygons, texturesInPolygons, normalsInPolygons);
+    }
+
+    public Model clone(){
+        Model clone = new Model();
+        clone.normals = new ArrayList<>(this.normals);
+        clone.vertices = new ArrayList<>(this.vertices);
+        clone.textureVertices = new ArrayList<>(this.textureVertices);
+        clone.polygons = new ArrayList<>(this.polygons);
+        clone.normalsInPolygons = normalsInPolygons;
+        clone.texturesInPolygons = texturesInPolygons;
+        return clone;
+    }
+
+    public void Shift(Vector3 v){
+        vertices.forEach(s -> s.sum(v));
+    }
+
+    public void XStretching(double n){
+        vertices.forEach(s -> s.x *= n);
+    }
+
+    public void YStretching(double n){
+        vertices.forEach(s -> s.y *= n);
+    }
+
+    public void ZStretching(double n){
+        vertices.forEach(s -> s.z *= n);
     }
 }
