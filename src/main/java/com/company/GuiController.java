@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
@@ -24,6 +25,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.IOException;
 import java.io.File;
 import java.util.Date;
 
@@ -46,12 +48,14 @@ public class GuiController {
             new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
 
+    private Timeline timeline;
+
     @FXML
     private void initialize() {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
-        Timeline timeline = new Timeline();
+        timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
@@ -139,7 +143,6 @@ public class GuiController {
 
     private long lastEventTime = 0;
     private Direction lastEventDirection = Direction.FORWARD;
-    //private boolean cameraMoved = true;
 
     private void changeTranslation(Direction direction) {
         long now = new Date().getTime();
@@ -226,5 +229,14 @@ public class GuiController {
         Direction nowDirection = Direction.RIGHT;
         changeTranslation(nowDirection);
         camera.moveTarget(new Vector3(-translation, 0F , 0F));
+    }
+
+    @FXML
+    public void triangulateModel(){
+        try {
+            model.triangulate();
+        } catch (Exception e) {
+            handle(e);
+        }
     }
 }

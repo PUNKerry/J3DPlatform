@@ -4,6 +4,8 @@ import com.company.base.Polygon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 public class PolygonTest {
     //1 step of testing - test in adding vertexes to poly
     @Test
@@ -109,4 +111,18 @@ public class PolygonTest {
         Assertions.assertTrue(poly.isNormalsExists());
     }
 
+    @Test
+    void triangulationTest1() throws Exception {
+        Polygon polygon = new Polygon();
+        polygon.addNewVertex(1, -1, -1);
+        polygon.addNewVertex(2, -1, -1);
+        polygon.addNewVertex(3, -1, -1);
+        polygon.addNewVertex(4, -1, -1);
+        polygon.addNewVertex(5, -1, -1);
+        List<Polygon> polygons = polygon.triangulate();
+        Assertions.assertEquals(polygons.size(), 3);
+        for (Polygon triangulated : polygons) {
+            Assertions.assertEquals(triangulated.countOfVertices(), 3);
+        }
+    }
 }
