@@ -72,6 +72,39 @@ public class Polygon {
         return indicesVertexes.size();
     }
 
+    public List<Polygon> triangulate() throws Exception {
+        if (countOfVertices() > 3) {
+            List<Polygon> newPolygons = new ArrayList<>();
+            for (int vertexIndex = 2; vertexIndex < countOfVertices(); vertexIndex++) {
+                Polygon newPolygon = new Polygon();
+
+                for (int vertexIndexInsideNew = 0; vertexIndexInsideNew != vertexIndex; ) {
+                    if (newPolygon.countOfVertices() == 1) {
+                        vertexIndexInsideNew = vertexIndex - 1;
+                    }
+                    if (newPolygon.countOfVertices() == 2) {
+                        vertexIndexInsideNew = vertexIndex;
+                    }
+                    int indexV = getVertexIndex(vertexIndexInsideNew);
+                    int indexVt = -1;
+                    if (isTexturesExists()) {
+                        indexVt = getTextureVertexIndex(vertexIndexInsideNew);
+                    }
+                    int indexVn = -1;
+                    if (isNormalsExists()) {
+                        indexVn = getNormalIndex(vertexIndexInsideNew);
+                    }
+                    newPolygon.addNewVertex(indexV, indexVt, indexVn);
+                }
+
+                newPolygons.add(newPolygon);
+            }
+            return newPolygons;
+        } else {
+            return List.of(this);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -24,7 +24,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
 import java.io.File;
 import java.util.Date;
 
@@ -79,7 +78,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Load Model");
 
-        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -100,7 +99,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Save Model");
 
-        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
+        File file = fileChooser.showSaveDialog(canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -139,7 +138,6 @@ public class GuiController {
 
     private long lastEventTime = 0;
     private Direction lastEventDirection = Direction.FORWARD;
-    private boolean cameraMoved = true;
 
     private void changeTranslation(Direction direction) {
         long now = new Date().getTime();
@@ -226,5 +224,14 @@ public class GuiController {
         Direction nowDirection = Direction.RIGHT;
         changeTranslation(nowDirection);
         camera.moveTarget(new Vector3(-translation, 0F , 0F));
+    }
+
+    @FXML
+    public void triangulateModel(){
+        try {
+            model.triangulate();
+        } catch (Exception e) {
+            handle(e);
+        }
     }
 }

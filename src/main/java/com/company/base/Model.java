@@ -98,6 +98,15 @@ public class Model {
         return polygons.get(index);
     }
 
+    public void triangulate() throws Exception {
+        List<Polygon> allPolygons = new ArrayList<>();
+        for (Polygon polygon : polygons) {
+            allPolygons.addAll(polygon.triangulate());
+        }
+        polygons.clear();
+        polygons.addAll(allPolygons);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
