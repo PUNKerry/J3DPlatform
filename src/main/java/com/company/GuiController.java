@@ -94,7 +94,7 @@ public class GuiController {
         }
     }
     private static final double STRETCH = 0.01;
-    private static final double MOVE = 1;
+    private static final double MOVE = 2;
 
     @FXML
     private void stretchX() {
