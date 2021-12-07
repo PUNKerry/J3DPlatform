@@ -2,14 +2,12 @@ package com.company.engine;
 
 import com.company.base.Model;
 import com.company.base.Polygon;
-import com.company.math.entity.Point2;
 import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -37,10 +35,13 @@ public class RenderEngine {
         modelViewProjectionMatrix.mul(viewMatrix);
         modelViewProjectionMatrix.mul(projectionMatrix);
 
-        float[][] zBuffer = new float[height][width];
+        final float[][] zBuffer = new float[height][width];
 
-        final int nPolygons = model.getCountOfPolygons();
-        for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
+        for (float[] row : zBuffer) {
+            Arrays.fill(row, Float.MAX_VALUE);
+        }
+
+        for (int polygonInd = 0; polygonInd < model.getCountOfPolygons(); ++polygonInd) {
             final Polygon polygon = model.getPolygon(polygonInd);
 
             final int nVerticesInPolygon = polygon.countOfVertices();
@@ -70,10 +71,6 @@ public class RenderEngine {
             } else {
 
                 PixelWriter pixelWriter = graphicsContext.getPixelWriter();
-                PixelReader pixelReader = texture.getPixelReader();
-                for (float[] arr : zBuffer) {
-                    Arrays.fill(arr, Float.MIN_VALUE);
-                }
 
                 List<Vector3> copyResult = new ArrayList<>(resultPoints);
 
@@ -94,10 +91,10 @@ public class RenderEngine {
                 Vector2 vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p1)));
                 Vector2 vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p2)));
 
-                if (Math.round(p0.y) == Math.round(p1.y)) {
-                    drawDownDirected(pixelWriter, pixelReader, zBuffer, p2, p0, p1, vt2, vt0, vt1);
-                } else if (Math.round(p1.y) == Math.round(p2.y)) {
-                    drawUpDirected(pixelWriter, pixelReader, zBuffer, p0, p1, p2, vt0, vt1, vt2);
+                if (Math.floor(p0.y) == Math.floor(p1.y)) {
+                    drawDownDirected(pixelWriter, texture, zBuffer, p2, p0, p1, vt2, vt0, vt1);
+                } else if (Math.floor(p1.y) == Math.floor(p2.y)) {
+                    drawUpDirected(pixelWriter, texture, zBuffer, p0, p1, p2, vt0, vt1, vt2);
                 } else {
                     Vector3 p3 = new Vector3(calcFormulaX(p0.toVector2(), p2.toVector2(), p1.y), p1.y, calcFormulaZ(p0, p2, p1.y));
                     float scale = p3.subtraction(p0).length() / p2.subtraction(p0).length();
@@ -105,30 +102,30 @@ public class RenderEngine {
                     vt3.multiplyingAVectorByAScalar(scale);
                     vt3 = vt3.sum(vt0);
                     if (p1.x < p3.x) {
-                        drawUpDirected(pixelWriter, pixelReader, zBuffer, p0, p1, p3, vt0, vt1, vt3);
-                        drawDownDirected(pixelWriter, pixelReader, zBuffer, p2, p1, p3, vt2, vt1, vt3);
+                        drawUpDirected(pixelWriter, texture, zBuffer, p0, p1, p3, vt0, vt1, vt3);
+                        drawDownDirected(pixelWriter, texture, zBuffer, p2, p1, p3, vt2, vt1, vt3);
                     } else {
-                        drawUpDirected(pixelWriter, pixelReader, zBuffer, p0, p3, p1, vt0, vt3, vt1);
-                        drawDownDirected(pixelWriter, pixelReader, zBuffer, p2, p3, p1, vt2, vt3, vt1);
+                        drawUpDirected(pixelWriter, texture, zBuffer, p0, p3, p1, vt0, vt3, vt1);
+                        drawDownDirected(pixelWriter, texture, zBuffer, p2, p3, p1, vt2, vt3, vt1);
                     }
                 }
             }
         }
     }
 
-    private static void drawUpDirected(PixelWriter pixelWriter, PixelReader pixelReader, float[][] zBuffer,
+    private static void drawUpDirected(PixelWriter pixelWriter, Image texture, float[][] zBuffer,
                                        Vector3 p0, Vector3 p1, Vector3 p2,
                                        Vector2 vt0, Vector2 vt1, Vector2 vt2) {
         for (int row = (int) Math.ceil(p0.y); row <= Math.floor(p1.y); row++) {
-            draw(pixelWriter, pixelReader, zBuffer, p0, p1, p2, vt0, vt1, vt2, row);
+            draw(pixelWriter, texture, zBuffer, p0, p1, p2, vt0, vt1, vt2, row);
         }
     }
 
-    private static void drawDownDirected(PixelWriter pixelWriter, PixelReader pixelReader, float[][] zBuffer,
+    private static void drawDownDirected(PixelWriter pixelWriter, Image texture, float[][] zBuffer,
                                          Vector3 p0, Vector3 p1, Vector3 p2,
                                          Vector2 vt0, Vector2 vt1, Vector2 vt2) {
         for (int row = (int) Math.floor(p0.y); row >= Math.ceil(p1.y); row--) {
-            draw(pixelWriter, pixelReader, zBuffer, p0, p1, p2, vt0, vt1, vt2, row);
+            draw(pixelWriter, texture, zBuffer, p0, p1, p2, vt0, vt1, vt2, row);
         }
     }
 
@@ -142,7 +139,7 @@ public class RenderEngine {
         pixelWriter.setColor(Math.round(right), row, Color.rgb(0,0,0,1.0));
     }
 
-    private static void draw(PixelWriter pixelWriter, PixelReader pixelReader, float[][] zBuffer,
+    private static void draw(PixelWriter pixelWriter, Image texture, float[][] zBuffer,
                              Vector3 p0, Vector3 p1, Vector3 p2,
                              Vector2 vt0, Vector2 vt1, Vector2 vt2, int row) {
         float left = calcFormulaX(p0.toVector2(), p1.toVector2(), row);
@@ -153,7 +150,7 @@ public class RenderEngine {
                 continue;
             }
             float z = calcZOnSurface(p0, p1, p2, o);
-            if (zBuffer[row][col] < z) {
+            if (zBuffer[row][col] > z) {
                 zBuffer[row][col] = z;
                 Vector2 dp1 = p1.subtraction(p0).toVector2();
                 Vector2 dp2 = p2.subtraction(p0).toVector2();
@@ -162,12 +159,17 @@ public class RenderEngine {
                 float alpha = calcAlpha(dO, dp1, dp2, beta);
                 Vector2 pointOnTexture = new Vector2(vt0.x * (1 - alpha - beta) + vt1.x * alpha + vt2.x * beta,
                         vt0.y * (1 - alpha - beta) + vt1.y * alpha + vt2.y * beta);
-                Color color = pixelReader.getColor(Math.round(pointOnTexture.x), Math.round(pointOnTexture.y));
+                pointOnTexture.x = pointOnTexture.x * (float) texture.getWidth();
+                pointOnTexture.y = (float) texture.getHeight() * (1 - pointOnTexture.y);
+                Color color = texture.getPixelReader().getColor((int) Math.floor(pointOnTexture.x),
+                        (int) Math.floor(pointOnTexture.y));
                 pixelWriter.setColor(col, row, color);
             }
         }
-        pixelWriter.setColor(Math.round(left), row, Color.rgb(0,0,0,1.0));
-        pixelWriter.setColor(Math.round(right), row, Color.rgb(0,0,0,1.0));
+        if (false) { //todo: condition from parameters
+            pixelWriter.setColor(Math.round(left), row, Color.rgb(0,0,0,1.0));
+            pixelWriter.setColor(Math.round(right), row, Color.rgb(0,0,0,1.0));
+        }
     }
 
     private static float calcFormulaX(final Vector2 p0,
