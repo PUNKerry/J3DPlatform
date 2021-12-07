@@ -85,6 +85,10 @@ public class Vector3 implements Vector<Vector3> {
         return (x * v.x + y * v.y + z * v.z)/length()/v.length();
     }
 
+    public Vector2 toVector2() {
+        return new Vector2(x, y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

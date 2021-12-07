@@ -3,6 +3,8 @@ import com.company.math.entity.Point2;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
 
+import javax.vecmath.*;
+
 public class GraphicConveyor {
 
     public static Matrix4 rotateScaleTranslate() {
@@ -65,7 +67,7 @@ public class GraphicConveyor {
         return new Vector3(x / w, y / w, z / w);
     }
 
-    public static Point2 vertexToPoint(final Vector3 vertex, final int width, final int height) {
-        return new Point2(vertex.x * width + width / 2.0F, (float) (-vertex.y * height + height / 2.0F));
+    public static Vector3 vertexToPoint(final Vector3 vertex, final int width, final int height) {
+        return new Vector3(vertex.x * width + width / 2.0F, (-vertex.y * height + height / 2.0F), vertex.z);
     }
 }

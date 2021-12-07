@@ -113,20 +113,20 @@ public class Matrix4 {
     protected float determinant4(float[][] m){
         float res = 0;
         float[][] d = {{m[1][1], m[1][2], m[1][3]},
-                       {m[2][1], m[2][2], m[2][3]},
-                       {m[3][1], m[3][2], m[3][3]}};
+                {m[2][1], m[2][2], m[2][3]},
+                {m[3][1], m[3][2], m[3][3]}};
         res += m[0][0] * Matrix3.determinant3(d);
         float[][] d2 = {{m[1][0], m[1][2], m[1][3]},
-                        {m[2][0], m[2][2], m[2][3]},
-                        {m[3][0], m[3][2], m[3][3]}};
+                {m[2][0], m[2][2], m[2][3]},
+                {m[3][0], m[3][2], m[3][3]}};
         res -= m[0][1] * Matrix3.determinant3(d2);
         float[][] d3 = {{m[1][0], m[1][1], m[1][3]},
-                        {m[2][0], m[2][1], m[2][3]},
-                        {m[3][0], m[3][1], m[3][3]}};
+                {m[2][0], m[2][1], m[2][3]},
+                {m[3][0], m[3][1], m[3][3]}};
         res += m[0][2] * Matrix3.determinant3(d3);
         float[][] d4 = {{m[1][0], m[1][1], m[1][2]},
-                        {m[2][0], m[2][1], m[2][2]},
-                        {m[3][0], m[3][1], m[3][2]}};
+                {m[2][0], m[2][1], m[2][2]},
+                {m[3][0], m[3][1], m[3][2]}};
         res -= m[0][3] * Matrix3.determinant3(d4);
         return res;
     }
@@ -221,7 +221,7 @@ public class Matrix4 {
         this.matrix[3][2] = var16;
         this.matrix[3][3] = var17;
     }
-    
+
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(matrix);

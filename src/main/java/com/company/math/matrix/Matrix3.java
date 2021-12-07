@@ -13,12 +13,11 @@ public class Matrix3 {
         }
     }
 
-    public float[] getVerticles(int index) {
+    public float[] getVerticals(int index) {
         float[] toReturn = new float[3];
         for (int i = 0; i < 3; i++) {
             toReturn[i] = matrix[i][index];
         }
-
         return toReturn;
     }
 
@@ -104,7 +103,7 @@ public class Matrix3 {
         return new Vector3(m[0], m[1], m[2]);
     }
 
-    private static float determinant2(float[][] m){
+    public static float determinant2(float[][] m){
         return m[0][0] * m[1][1] - m[1][0] * m[0][1];
     }
 

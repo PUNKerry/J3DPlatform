@@ -66,6 +66,11 @@
             </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="Viewpoint Options">
+            <MenuItem mnemonicParsing="false" onAction="#viewClear" text="Look At Start">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DIGIT0"/>
+                </accelerator>
+            </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#viewPointUp" text="Up">
                 <accelerator>
                     <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="W"/>

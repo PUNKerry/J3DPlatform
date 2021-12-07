@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
@@ -26,7 +25,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
 import java.io.File;
 import java.util.Date;
 
@@ -100,6 +98,7 @@ public class GuiController {
     @FXML
     private void loadTextureOnClick() {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpeg)", "*.jpeg"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpg)", "*.jpg"));
         fileChooser.setTitle("Load Texture");
 
@@ -110,6 +109,7 @@ public class GuiController {
 
         try {
             texture = new Image(file.toString());
+            model.triangulate();
         } catch (Exception e) {
             handle(e);
         }
@@ -221,6 +221,11 @@ public class GuiController {
         Direction nowDirection = Direction.DOWN;
         changeTranslation(nowDirection);
         camera.movePosition(nowDirection, -translation);
+    }
+
+    @FXML
+    public void viewClear() {
+        camera.setTarget(new Vector3(0, 0, 0));
     }
 
     @FXML
