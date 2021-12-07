@@ -93,6 +93,68 @@ public class GuiController {
             handle(e);
         }
     }
+    private static final double STRETCH = 0.01;
+    private static final double MOVE = 1;
+
+    @FXML
+    private void stretchX() {
+        model.XStretching(model.getXStretching() + STRETCH);
+    }
+
+    @FXML
+    private void stretchY() {
+        model.YStretching(model.getYStretching() + STRETCH);
+    }
+
+    @FXML
+    private void stretchZ() {
+        model.ZStretching(model.getZStretching() + STRETCH);
+    }
+
+    @FXML
+    private void pullItOffX() {
+        model.XStretching(model.getXStretching() - STRETCH);
+    }
+
+    @FXML
+    private void pullItOffY() {
+        model.YStretching(model.getYStretching() - STRETCH);
+    }
+
+    @FXML
+    private void pullItOffZ() {
+        model.ZStretching(model.getZStretching() - STRETCH);
+    }
+
+    @FXML
+    private void moveXInAPositiveDirection() {
+        model.move(new Vector3(MOVE, 0 , 0));
+    }
+
+    @FXML
+    private void moveXInANegativeDirection() {
+        model.move(new Vector3(-MOVE, 0 , 0));
+    }
+
+    @FXML
+    private void moveYInAPositiveDirection() {
+        model.move(new Vector3(0, MOVE , 0));
+    }
+
+    @FXML
+    private void moveYInANegativeDirection() {
+        model.move(new Vector3(0, -MOVE , 0));
+    }
+
+    @FXML
+    private void moveZInAPositiveDirection() {
+        model.move(new Vector3(0, 0 , MOVE));
+    }
+
+    @FXML
+    private void moveZInANegativeDirection() {
+        model.move(new Vector3(0, 0 , -MOVE));
+    }
 
     @FXML
     private void saveFileOnClick() {

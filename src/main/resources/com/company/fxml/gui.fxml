@@ -75,6 +75,68 @@
                 </accelerator>
             </MenuItem>
         </Menu>
+        <Menu mnemonicParsing="false" text="Model changing options">
+            <MenuItem mnemonicParsing="false" onAction="#pullItOffX" text="pull it off X">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD1"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#pullItOffY" text="pull it off Y">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD2"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#pullItOffZ" text="pull it off Z">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD3"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#stretchX" text="stretch X">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD4"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#stretchY" text="stretch Y">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD5"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#stretchZ" text="stretch Z">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD6"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveXInAPositiveDirection" text="move X in a positive direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="B"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveXInANegativeDirection" text="move X in a negative direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="G"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveYInAPositiveDirection" text="move Y in a positive direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="N"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveYInANegativeDirection" text="move Y in a negative direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="H"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveZInAPositiveDirection" text="move Z in a positive direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="M"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#moveZInANegativeDirection" text="move Z in a negative direction">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="J"/>
+                </accelerator>
+            </MenuItem>
+        </Menu>
     </MenuBar>
 
     <Canvas fx:id="canvas" width="1600" height="870" AnchorPane.topAnchor="30.0"/>
