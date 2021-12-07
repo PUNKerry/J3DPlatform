@@ -7,6 +7,7 @@ import com.company.math.vector.Vector3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Model {
 
@@ -123,7 +124,7 @@ public class Model {
     }
 
     public void Shift(Vector3 v){
-        vertices.forEach(s -> s.sum(v));
+        vertices = vertices.stream().map(s -> s = s.sum(v)).collect(Collectors.toList());
     }
 
     public void XStretching(double n){

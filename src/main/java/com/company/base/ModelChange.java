@@ -8,14 +8,14 @@ public class ModelChange {
     private double xStretching = 1;
     private double yStretching = 1;
     private double zStretching = 1;
-    private final Vector3 shift = new Vector3(0, 0, 0);
+    private Vector3 shift = new Vector3(0, 0, 0);
 
     public ModelChange(Model initialModel) {
         this.initialModel = initialModel;
     }
 
     public void move(Vector3 v){
-        shift.sum(v);
+        shift = shift.sum(v);
         if(changingModel == null) changingModel = initialModel.clone();
         changingModel.Shift(v);
     }
