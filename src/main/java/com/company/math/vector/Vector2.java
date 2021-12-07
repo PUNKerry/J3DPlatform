@@ -3,10 +3,10 @@ package com.company.math.vector;
 import java.util.Objects;
 
 public class Vector2 implements Vector<Vector2>{
-    public double x;
-    public double y;
+    public float x;
+    public float y;
 
-    public Vector2(double x, double y) {
+    public Vector2(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -15,8 +15,8 @@ public class Vector2 implements Vector<Vector2>{
 
     }
 
-    public double length(){
-        return Math.sqrt(x * x + y * y);
+    public float length(){
+        return (float) Math.sqrt(x * x + y * y);
     }
 
     public Vector2 sum(Vector2 v){
@@ -28,12 +28,12 @@ public class Vector2 implements Vector<Vector2>{
         return new Vector2(x - v.x, y - v.y);
     }
 
-    public void multiplyingAVectorByAScalar(double k){
+    public void multiplyingAVectorByAScalar(float k){
         x *= k;
         y *= k;
     }
 
-    public double scalarProduct(Vector2 v){
+    public float scalarProduct(Vector2 v){
         return (x * v.x + y * v.y)/length()/v.length();
     }
 
@@ -42,7 +42,7 @@ public class Vector2 implements Vector<Vector2>{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vector2 vector2 = (Vector2) o;
-        return Double.compare(vector2.x, x) == 0 && Double.compare(vector2.y, y) == 0;
+        return Float.compare(vector2.x, x) == 0 && Float.compare(vector2.y, y) == 0;
     }
 
     @Override

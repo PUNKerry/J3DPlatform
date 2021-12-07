@@ -3,11 +3,11 @@ package com.company.math.vector;
 import java.util.Objects;
 
 public class Vector3 implements Vector<Vector3> {
-    public double x;
-    public double y;
-    public double z;
+    public float x;
+    public float y;
+    public float z;
 
-    public Vector3(double x, double y, double z) {
+    public Vector3(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -53,8 +53,8 @@ public class Vector3 implements Vector<Vector3> {
         this.y = y;
     }
 
-    public double length(){
-        return Math.sqrt(x * x + y * y + z * z);
+    public float length(){
+        return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
     public Vector3 sum(Vector3 v){
@@ -69,7 +69,7 @@ public class Vector3 implements Vector<Vector3> {
         return new Vector3(x - v.x, y - v.y, z - v.z);
     }
 
-    public void multiplyingAVectorByAScalar(double k){
+    public void multiplyingAVectorByAScalar(float k){
         x *= k;
         y *= k;
         z *= k;
@@ -81,7 +81,7 @@ public class Vector3 implements Vector<Vector3> {
         this.z = var1.z - var2.z;
     }
 
-    public double scalarProduct(Vector3 v){
+    public float scalarProduct(Vector3 v){
         return (x * v.x + y * v.y + z * v.z)/length()/v.length();
     }
 
@@ -90,7 +90,7 @@ public class Vector3 implements Vector<Vector3> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vector3 vector3 = (Vector3) o;
-        return Double.compare(vector3.x, x) == 0 && Double.compare(vector3.y, y) == 0 && Double.compare(vector3.z, z) == 0;
+        return Float.compare(vector3.x, x) == 0 && Float.compare(vector3.y, y) == 0 && Float.compare(vector3.z, z) == 0;
     }
 
     @Override

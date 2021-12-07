@@ -2,11 +2,11 @@ package com.company.engine;
 
 import com.company.base.Model;
 import com.company.base.Polygon;
+import com.company.math.entity.Point2;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
 import javafx.scene.canvas.GraphicsContext;
 
-import javax.vecmath.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +35,10 @@ public class RenderEngine {
 
             final int nVerticesInPolygon = polygon.countOfVertices();
 
-            List<Point2f> resultPoints = new ArrayList<>();
+            List<Point2> resultPoints = new ArrayList<>();
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
                 Vector3 vertex = model.getVertex(polygon.getVertexIndex(vertexInPolygonInd));
-                Point2f resultPoint = vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height);
+                Point2 resultPoint = vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height);
                 resultPoints.add(resultPoint);
             }
 

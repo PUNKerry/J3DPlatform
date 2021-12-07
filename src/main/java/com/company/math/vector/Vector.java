@@ -1,17 +1,17 @@
 package com.company.math.vector;
 
 public interface Vector<V> {
-     double length();
+     float length();
 
      V sum(V v);
 
      V subtraction(V v);
 
-     void multiplyingAVectorByAScalar(double k);
+     void multiplyingAVectorByAScalar(float k);
 
-     double scalarProduct(V v);
+     float scalarProduct(V v);
 
-     default void dividingAVectorByAScalar(double k){
+     default void dividingAVectorByAScalar(float k){
         multiplyingAVectorByAScalar(1/k);
     }
 

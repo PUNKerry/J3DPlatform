@@ -5,16 +5,16 @@ import com.company.math.vector.Vector3;
 import java.util.Arrays;
 
 public class Matrix3 {
-    public double[][] matrix = new double[3][3];
+    public float[][] matrix = new float[3][3];
 
-    public Matrix3(double[][] m) {
+    public Matrix3(float[][] m) {
         for (int i = 0; i < 3; i++) {
             matrix[i] = m[i].clone();
         }
     }
 
-    public double[] getVerticles(int index) {
-        double[] toReturn = new double[3];
+    public float[] getVerticles(int index) {
+        float[] toReturn = new float[3];
         for (int i = 0; i < 3; i++) {
             toReturn[i] = matrix[i][index];
         }
@@ -66,7 +66,7 @@ public class Matrix3 {
     }
 
     public void transposition(){
-        double[][] tmp = new double[3][3];
+        float[][] tmp = new float[3][3];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 tmp[i][j] = matrix[j][i];
@@ -76,7 +76,7 @@ public class Matrix3 {
     }
 
     public Matrix3 transpositionMatrix(){
-        double[][] res = new double[3][3];
+        float[][] res = new float[3][3];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 res[i][j] = matrix[j][i];
@@ -87,7 +87,7 @@ public class Matrix3 {
 
     public Matrix3 reverseMatrix(){
         Matrix3 m = transpositionMatrix();
-        double det = determinant();
+        float det = determinant();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 m.matrix[i][j] /= det;
@@ -97,34 +97,34 @@ public class Matrix3 {
     }
 
     public Vector3 multiplyingOnVector(final Vector3 v){
-        double[] m = new double[3];
+        float[] m = new float[3];
         for (int i = 0; i < 3; i++) {
             m[i] =  matrix[i][0] * v.x + matrix[i][1] * v.y + matrix[i][2] * v.z;
         }
         return new Vector3(m[0], m[1], m[2]);
     }
 
-    private static double determinant2(double[][] m){
+    private static float determinant2(float[][] m){
         return m[0][0] * m[1][1] - m[1][0] * m[0][1];
     }
 
-    protected static double determinant3(double[][] m){
-        double res = 0;
-        double[][] d = {{m[1][1], m[1][2]}, {m[2][1], m[2][2]}};
+    protected static float determinant3(float[][] m){
+        float res = 0;
+        float[][] d = {{m[1][1], m[1][2]}, {m[2][1], m[2][2]}};
         res += m[0][0] * determinant2(d);
-        double[][] d2 = {{m[1][0], m[1][2]}, {m[2][0], m[2][2]}};
+        float[][] d2 = {{m[1][0], m[1][2]}, {m[2][0], m[2][2]}};
         res -= m[0][1] * determinant2(d2);
-        double[][] d3 = {{m[1][0], m[1][1]}, {m[2][0], m[2][1]}};
+        float[][] d3 = {{m[1][0], m[1][1]}, {m[2][0], m[2][1]}};
         res += m[0][2] * determinant2(d3);
         return res;
     }
 
-    public double determinant(){
+    public float determinant(){
         return determinant3(matrix);
     }
 
     public Vector3 systemOfEquations(Vector3 v){
-        double n = matrix[1][0]/matrix[0][0];
+        float n = matrix[1][0]/matrix[0][0];
         for (int i = 0; i < 3; i++) {
             matrix[1][i] -= matrix[0][i] * n;
         }
@@ -139,11 +139,11 @@ public class Matrix3 {
             matrix[2][i] -= matrix[1][i] * n;
         }
         v.z -= v.y * n;
-        double z = v.z / matrix[2][2];
+        float z = v.z / matrix[2][2];
         v.y -= matrix[1][2] * z;
-        double y = v.y / matrix[1][1];
+        float y = v.y / matrix[1][1];
         v.x -= matrix[0][1] * y + matrix[0][2] *z;
-        double x = v.x / matrix[0][0];
+        float x = v.x / matrix[0][0];
         return new Vector3(x,y,z);
     }
 

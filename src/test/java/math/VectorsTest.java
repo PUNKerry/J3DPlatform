@@ -148,7 +148,7 @@ class VectorsTest {
     public void testDividing4() {
         Vector4 v = new Vector4(1, 10, 5, 15);
         v.dividingAVectorByAScalar(5);
-        Vector4 res = new Vector4(0.2, 2, 1, 3);
+        Vector4 res = new Vector4((float) 0.2, 2, 1, 3);
         Assertions.assertEquals(res, v);
     }
 

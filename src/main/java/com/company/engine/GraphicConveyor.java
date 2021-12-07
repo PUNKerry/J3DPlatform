@@ -1,8 +1,7 @@
 package com.company.engine;
+import com.company.math.entity.Point2;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
-
-import javax.vecmath.*;
 
 public class GraphicConveyor {
 
@@ -36,9 +35,9 @@ public class GraphicConveyor {
         resultZ.normalize();
 
         float[] matrix = new float[]{
-                (float) resultX.x, (float) resultY.x, (float) resultZ.x, 0,
-                (float) resultX.y, (float) resultY.y, (float) resultZ.y, 0,
-                (float) resultX.z, (float) resultY.z, (float) resultZ.z, 0,
+                resultX.x, resultY.x, resultZ.x, 0,
+                resultX.y, resultY.y, resultZ.y, 0,
+                resultX.z, resultY.z, resultZ.z, 0,
                 -resultX.dot(eye), -resultY.dot(eye), -resultZ.dot(eye), 1};
         return new Matrix4(matrix);
     }
@@ -59,14 +58,14 @@ public class GraphicConveyor {
     }
 
     public static Vector3 multiplyMatrix4ByVector3(final Matrix4 matrix, final Vector3 vertex) {
-        final float x = (float) ((vertex.x * matrix.matrix[0][0]) + (vertex.y * matrix.matrix[1][0]) + (vertex.z * matrix.matrix[2][0]) + matrix.matrix[3][0]);
-        final float y = (float) ((vertex.x * matrix.matrix[0][1]) + (vertex.y * matrix.matrix[1][1]) + (vertex.z * matrix.matrix[2][1]) + matrix.matrix[3][1]);
-        final float z = (float) ((vertex.x * matrix.matrix[0][2]) + (vertex.y * matrix.matrix[1][2]) + (vertex.z * matrix.matrix[2][2]) + matrix.matrix[3][2]);
-        final float w = (float) ((vertex.x * matrix.matrix[0][3]) + (vertex.y * matrix.matrix[1][3]) + (vertex.z * matrix.matrix[2][3]) + matrix.matrix[3][3]);
+        final float x = (vertex.x * matrix.matrix[0][0]) + (vertex.y * matrix.matrix[1][0]) + (vertex.z * matrix.matrix[2][0]) + matrix.matrix[3][0];
+        final float y = (vertex.x * matrix.matrix[0][1]) + (vertex.y * matrix.matrix[1][1]) + (vertex.z * matrix.matrix[2][1]) + matrix.matrix[3][1];
+        final float z = (vertex.x * matrix.matrix[0][2]) + (vertex.y * matrix.matrix[1][2]) + (vertex.z * matrix.matrix[2][2]) + matrix.matrix[3][2];
+        final float w = (vertex.x * matrix.matrix[0][3]) + (vertex.y * matrix.matrix[1][3]) + (vertex.z * matrix.matrix[2][3]) + matrix.matrix[3][3];
         return new Vector3(x / w, y / w, z / w);
     }
 
-    public static Point2f vertexToPoint(final Vector3 vertex, final int width, final int height) {
-        return new Point2f((float) (vertex.x * width + width / 2.0F), (float) (-vertex.y * height + height / 2.0F));
+    public static Point2 vertexToPoint(final Vector3 vertex, final int width, final int height) {
+        return new Point2(vertex.x * width + width / 2.0F, (float) (-vertex.y * height + height / 2.0F));
     }
 }
