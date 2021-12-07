@@ -22,6 +22,7 @@ import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class GuiController {
@@ -37,6 +38,7 @@ public class GuiController {
     private Canvas canvas;
 
     private ModelChange model = null;
+    private final ArrayList<ModelChange> models = new ArrayList<>();
 
     private Camera camera = new Camera(
             new Vector3(0, 0, 100),
@@ -60,12 +62,21 @@ public class GuiController {
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
 
-            if (model != null) {
-                Model m;
+//            if (model != null) {
+//                Model m;
+//                if(model.getChangingModel() != null){
+//                    m = model.getChangingModel();
+//                }else m = model.getInitialModel();
+//                RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
+//            }
+            if(!models.isEmpty()){
+                models.forEach(model -> {
+                    Model m;
                 if(model.getChangingModel() != null){
                     m = model.getChangingModel();
                 }else m = model.getInitialModel();
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
+                });
             }
         });
 
@@ -88,7 +99,8 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            model = new ModelChange(ObjReader.read(fileContent));
+            //model = new ModelChange(ObjReader.read(fileContent));
+            models.add(new ModelChange(ObjReader.read(fileContent)));
         } catch (Exception e) {
             handle(e);
         }
@@ -98,62 +110,98 @@ public class GuiController {
 
     @FXML
     private void stretchX() {
-        model.XStretching(model.getXStretching() + STRETCH);
+        //model.XStretching(model.getXStretching() + STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() + STRETCH);
+        });
     }
 
     @FXML
     private void stretchY() {
-        model.YStretching(model.getYStretching() + STRETCH);
+      //  model.YStretching(model.getYStretching() + STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() + STRETCH);
+        });
     }
 
     @FXML
     private void stretchZ() {
-        model.ZStretching(model.getZStretching() + STRETCH);
+       // model.ZStretching(model.getZStretching() + STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() + STRETCH);
+        });
     }
 
     @FXML
     private void pullItOffX() {
-        model.XStretching(model.getXStretching() - STRETCH);
+       // model.XStretching(model.getXStretching() - STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() - STRETCH);
+        });
     }
 
     @FXML
     private void pullItOffY() {
-        model.YStretching(model.getYStretching() - STRETCH);
+        //model.YStretching(model.getYStretching() - STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() - STRETCH);
+        });
     }
 
     @FXML
     private void pullItOffZ() {
-        model.ZStretching(model.getZStretching() - STRETCH);
+        //model.ZStretching(model.getZStretching() - STRETCH);
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() - STRETCH);
+        });
     }
 
     @FXML
     private void moveXInAPositiveDirection() {
-        model.move(new Vector3(MOVE, 0 , 0));
+       // model.move(new Vector3(MOVE, 0 , 0));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(MOVE, 0, 0));
+        });
     }
 
     @FXML
     private void moveXInANegativeDirection() {
-        model.move(new Vector3(-MOVE, 0 , 0));
+        //model.move(new Vector3(-MOVE, 0 , 0));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(-MOVE, 0, 0));
+        });
     }
 
     @FXML
     private void moveYInAPositiveDirection() {
-        model.move(new Vector3(0, MOVE , 0));
+        //model.move(new Vector3(0, MOVE , 0));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, MOVE, 0));
+        });
     }
 
     @FXML
     private void moveYInANegativeDirection() {
-        model.move(new Vector3(0, -MOVE , 0));
+       // model.move(new Vector3(0, -MOVE , 0));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, -MOVE, 0));
+        });
     }
 
     @FXML
     private void moveZInAPositiveDirection() {
-        model.move(new Vector3(0, 0 , MOVE));
+       // model.move(new Vector3(0, 0 , MOVE));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, MOVE));
+        });
     }
 
     @FXML
     private void moveZInANegativeDirection() {
-        model.move(new Vector3(0, 0 , -MOVE));
+       // model.move(new Vector3(0, 0 , -MOVE));
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, -MOVE));
+        });
     }
 
     @FXML
@@ -278,4 +326,33 @@ public class GuiController {
         changeTranslation(nowDirection);
         camera.moveTarget(new Vector3(-translation, 0F , 0F));
     }
+
+
+
+    @FXML
+    public void activate1Model(ActionEvent actionEvent) {
+        if(models.size() >= 1) models.get(0).setChangingNow(!models.get(0).isChangingNow());
+    }
+
+    @FXML
+    public void activate2Model(ActionEvent actionEvent) {
+        if(models.size() >= 2) models.get(1).setChangingNow(!models.get(1).isChangingNow());
+    }
+
+    @FXML
+    public void activate3Model(ActionEvent actionEvent) {
+        if(models.size() >= 3) models.get(2).setChangingNow(!models.get(2).isChangingNow());
+    }
+
+    @FXML
+    public void activate4Model(ActionEvent actionEvent) {
+        if(models.size() >= 4)  models.get(3).setChangingNow(!models.get(3).isChangingNow());
+    }
+
+    @FXML
+    public void activate5Model(ActionEvent actionEvent) {
+        if(models.size() >= 5) models.get(4).setChangingNow(!models.get(4).isChangingNow());
+    }
+
+
 }

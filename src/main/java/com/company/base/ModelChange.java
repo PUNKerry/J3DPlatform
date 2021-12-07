@@ -9,6 +9,7 @@ public class ModelChange {
     private double yStretching = 1;
     private double zStretching = 1;
     private Vector3 shift = new Vector3(0, 0, 0);
+    private boolean isChangingNow = true;
 
     public ModelChange(Model initialModel) {
         this.initialModel = initialModel;
@@ -60,5 +61,13 @@ public class ModelChange {
 
     public double getZStretching() {
         return zStretching;
+    }
+
+    public boolean isChangingNow() {
+        return isChangingNow;
+    }
+
+    public void setChangingNow(boolean changingNow) {
+        isChangingNow = changingNow;
     }
 }
