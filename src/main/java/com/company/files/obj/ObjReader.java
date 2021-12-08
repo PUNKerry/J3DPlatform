@@ -67,9 +67,9 @@ public class ObjReader {
                 default -> {}
             }
         }
-        if(quantityVertex != quantityNormal && quantityNormal != 0){
-            throw new ObjReaderException("the quantity of vertices and normals does not match");
-        }
+//        if(quantityVertex != quantityNormal && quantityNormal != 0){
+//            throw new ObjReaderException("the quantity of vertices and normals does not match");
+//        }
         if(maxVertexIndex > quantityVertex) {
             throw new ObjReaderException("A vertex index is specified that exceeds the number of vertices");
         }

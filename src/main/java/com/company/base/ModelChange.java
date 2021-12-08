@@ -1,13 +1,14 @@
 package com.company.base;
 
+import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 
 public class ModelChange {
     private final Model initialModel;
     private Model changingModel = null;
-    private double xStretching = 1;
-    private double yStretching = 1;
-    private double zStretching = 1;
+    private float xStretching = 1;
+    private float yStretching = 1;
+    private float zStretching = 1;
     private Vector3 shift = new Vector3(0, 0, 0);
     private boolean isChangingNow = true;
 
@@ -21,22 +22,27 @@ public class ModelChange {
         changingModel.Shift(v);
     }
 
-    public void XStretching(double n){
+    public void XStretching(float n){
         if(changingModel == null) changingModel = initialModel.clone();
         changingModel.XStretching(n/xStretching);
         xStretching = n;
     }
 
-    public void YStretching(double n){
+    public void YStretching(float n){
         if(changingModel == null) changingModel = initialModel.clone();
         changingModel.YStretching(n/yStretching);
         yStretching = n;
     }
 
-    public void ZStretching(double n){
+    public void ZStretching(float n){
         if(changingModel == null) changingModel = initialModel.clone();
         changingModel.ZStretching(n/zStretching);
         zStretching = n;
+    }
+
+    public void rotation(Matrix3 rotationMatrix){
+        if(changingModel == null) changingModel = initialModel.clone();
+        changingModel.rotation(rotationMatrix, shift);
     }
 
     public Model getChangingModel() {
@@ -51,15 +57,15 @@ public class ModelChange {
         return shift;
     }
 
-    public double getXStretching() {
+    public float getXStretching() {
         return xStretching;
     }
 
-    public double getYStretching() {
+    public float getYStretching() {
         return yStretching;
     }
 
-    public double getZStretching() {
+    public float getZStretching() {
         return zStretching;
     }
 

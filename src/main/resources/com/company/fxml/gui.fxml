@@ -136,9 +136,39 @@
                     <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="J"/>
                 </accelerator>
             </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateX" text="rotateX">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD7"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateY" text="rotateY">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD8"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateZ" text="rotateZ">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="NUMPAD9"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateInTheOppositeDirectionX" text="rotateInTheOppositeDirectionX">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="F1"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateInTheOppositeDirectionY" text="rotateInTheOppositeDirectionY">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="F2"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#rotateInTheOppositeDirectionZ" text="rotateInTheOppositeDirectionZ">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="F3"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="models">
-            <MenuItem mnemonicParsing="false" onAction="#activate1Model" text="Up">
+            <MenuItem mnemonicParsing="false" onAction="#activate1Model" text="1 model">
                 <accelerator>
                     <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DIGIT1"/>
                 </accelerator>

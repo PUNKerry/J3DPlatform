@@ -7,6 +7,7 @@ import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
 import com.company.files.obj.ObjWriter;
+import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
@@ -62,13 +63,6 @@ public class GuiController {
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
 
-//            if (model != null) {
-//                Model m;
-//                if(model.getChangingModel() != null){
-//                    m = model.getChangingModel();
-//                }else m = model.getInitialModel();
-//                RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
-//            }
             if(!models.isEmpty()){
                 models.forEach(model -> {
                     Model m;
@@ -99,18 +93,19 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            //model = new ModelChange(ObjReader.read(fileContent));
             models.add(new ModelChange(ObjReader.read(fileContent)));
         } catch (Exception e) {
             handle(e);
         }
     }
-    private static final double STRETCH = 0.01;
-    private static final double MOVE = 2;
+    private static final float STRETCH = 0.01f;
+    private static final float MOVE = 2;
+    private static final float A = 0.02f;
+    private static final float COS_A = (float) Math.cos(A);
+    private static final float SIN_A = (float) Math.sin(A);
 
     @FXML
     private void stretchX() {
-        //model.XStretching(model.getXStretching() + STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() + STRETCH);
         });
@@ -118,7 +113,6 @@ public class GuiController {
 
     @FXML
     private void stretchY() {
-      //  model.YStretching(model.getYStretching() + STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() + STRETCH);
         });
@@ -126,7 +120,6 @@ public class GuiController {
 
     @FXML
     private void stretchZ() {
-       // model.ZStretching(model.getZStretching() + STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() + STRETCH);
         });
@@ -134,7 +127,6 @@ public class GuiController {
 
     @FXML
     private void pullItOffX() {
-       // model.XStretching(model.getXStretching() - STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() - STRETCH);
         });
@@ -142,7 +134,6 @@ public class GuiController {
 
     @FXML
     private void pullItOffY() {
-        //model.YStretching(model.getYStretching() - STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() - STRETCH);
         });
@@ -150,7 +141,6 @@ public class GuiController {
 
     @FXML
     private void pullItOffZ() {
-        //model.ZStretching(model.getZStretching() - STRETCH);
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() - STRETCH);
         });
@@ -158,7 +148,6 @@ public class GuiController {
 
     @FXML
     private void moveXInAPositiveDirection() {
-       // model.move(new Vector3(MOVE, 0 , 0));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(MOVE, 0, 0));
         });
@@ -166,7 +155,6 @@ public class GuiController {
 
     @FXML
     private void moveXInANegativeDirection() {
-        //model.move(new Vector3(-MOVE, 0 , 0));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(-MOVE, 0, 0));
         });
@@ -174,7 +162,6 @@ public class GuiController {
 
     @FXML
     private void moveYInAPositiveDirection() {
-        //model.move(new Vector3(0, MOVE , 0));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, MOVE, 0));
         });
@@ -182,7 +169,6 @@ public class GuiController {
 
     @FXML
     private void moveYInANegativeDirection() {
-       // model.move(new Vector3(0, -MOVE , 0));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, -MOVE, 0));
         });
@@ -190,7 +176,6 @@ public class GuiController {
 
     @FXML
     private void moveZInAPositiveDirection() {
-       // model.move(new Vector3(0, 0 , MOVE));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, MOVE));
         });
@@ -198,9 +183,56 @@ public class GuiController {
 
     @FXML
     private void moveZInANegativeDirection() {
-       // model.move(new Vector3(0, 0 , -MOVE));
         models.forEach(modelChange -> {
             if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, -MOVE));
+        });
+    }
+
+    @FXML
+    private void rotateX() {
+        double[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateY() {
+        double[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateZ() {
+        double[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionX() {
+        double[][] m = {{1, 0, 0},{0, COS_A, -SIN_A},{0, SIN_A, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionY() {
+        double[][] m = {{COS_A, 0, -SIN_A},{0, 1, 0},{SIN_A, 0, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionZ() {
+        double[][] m = {{COS_A, -SIN_A, 0},{SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
         });
     }
 

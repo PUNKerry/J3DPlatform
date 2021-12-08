@@ -1,6 +1,7 @@
 package com.company.base;
 
 import com.company.exceptions.ModelException;
+import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
 
@@ -127,15 +128,21 @@ public class Model {
         vertices = vertices.stream().map(s -> s = s.sum(v)).collect(Collectors.toList());
     }
 
-    public void XStretching(double n){
+    public void XStretching(float n){
         vertices.forEach(s -> s.x *= n);
     }
 
-    public void YStretching(double n){
+    public void YStretching(float n){
         vertices.forEach(s -> s.y *= n);
     }
 
-    public void ZStretching(double n){
+    public void ZStretching(float n){
         vertices.forEach(s -> s.z *= n);
+    }
+
+    public void rotation(Matrix3 rotationMatrix, Vector3 shift){
+        Shift(new Vector3(-shift.x, -shift.y, -shift.z));
+        vertices = vertices.stream().map(s -> s = rotationMatrix.multiplyingOnVector(s)).collect(Collectors.toList());
+        Shift(shift);
     }
 }
