@@ -16,7 +16,14 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -79,6 +86,11 @@ public class GuiController {
     }
 
     @FXML
+    GridPane gridPane;
+
+    private final ArrayList<Button> buttons = new ArrayList<>();
+
+    @FXML
     private void loadFileOnClick() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
@@ -94,9 +106,24 @@ public class GuiController {
         try {
             String fileContent = Files.readString(fileName);
             models.add(new ModelChange(ObjReader.read(fileContent)));
+            gridPane.getRowConstraints().add(new RowConstraints(100));
+            Button button = new Button("Active");
+            button.setFont(new Font(15));
+            button.setMinSize(100,70);
+            button.setStyle("-fx-background-color: gray;");
+            int n = models.size();
+            button.setOnMouseClicked(mouseEvent -> activateModel(n));
+            buttons.add(button);
+            Label label = new Label(" Model " + String.valueOf(n));
+            label.setMinSize(80,70);
+            label.setFont(new Font(15));
+            label.setStyle("-fx-background-color: gray;");
+            gridPane.add(label, 0, n);
+            gridPane.add(button, 1, n);
         } catch (Exception e) {
             handle(e);
         }
+
     }
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
@@ -359,31 +386,37 @@ public class GuiController {
         camera.moveTarget(new Vector3(-translation, 0F , 0F));
     }
 
-
+    public void activateModel(int n){
+        if(models.size() >= n) {
+            models.get(n - 1).setChangingNow(!models.get(n - 1).isChangingNow());
+            if(models.get(n - 1).isChangingNow()) buttons.get(n - 1).setText("Active");
+            else buttons.get(n - 1).setText("Not active");
+        }
+    }
 
     @FXML
     public void activate1Model(ActionEvent actionEvent) {
-        if(models.size() >= 1) models.get(0).setChangingNow(!models.get(0).isChangingNow());
+       activateModel(1);
     }
 
     @FXML
     public void activate2Model(ActionEvent actionEvent) {
-        if(models.size() >= 2) models.get(1).setChangingNow(!models.get(1).isChangingNow());
+        activateModel(2);
     }
 
     @FXML
     public void activate3Model(ActionEvent actionEvent) {
-        if(models.size() >= 3) models.get(2).setChangingNow(!models.get(2).isChangingNow());
+        activateModel(3);
     }
 
     @FXML
     public void activate4Model(ActionEvent actionEvent) {
-        if(models.size() >= 4)  models.get(3).setChangingNow(!models.get(3).isChangingNow());
+        activateModel(4);
     }
 
     @FXML
     public void activate5Model(ActionEvent actionEvent) {
-        if(models.size() >= 5) models.get(4).setChangingNow(!models.get(4).isChangingNow());
+        activateModel(5);
     }
 
 
