@@ -18,16 +18,16 @@
                     <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#loadTextureOnClick" text="Load Texture">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="P"/>
-                </accelerator>
-            </MenuItem>
+<!--            <MenuItem mnemonicParsing="false" onAction="#addTextureToModel" text="Load Texture">-->
+<!--                <accelerator>-->
+<!--                    <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />-->
+<!--                </accelerator>-->
+<!--            </MenuItem>-->
         </Menu>
         <Menu mnemonicParsing="false" text="Model">
             <MenuItem mnemonicParsing="false" onAction="#triangulateModel" text="Triangulate">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="T"/>
+                    <KeyCodeCombination alt="UP" code="T" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
         </Menu>
@@ -66,7 +66,7 @@
         <Menu mnemonicParsing="false" text="Viewpoint Options">
             <MenuItem mnemonicParsing="false" onAction="#viewClear" text="Look At Start">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DIGIT0"/>
+                    <KeyCodeCombination alt="UP" code="DIGIT0" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#viewPointUp" text="Up">
@@ -211,10 +211,11 @@
         </Menu>
     </MenuBar>
     <Canvas fx:id="canvas" height="870" width="1600" AnchorPane.topAnchor="30.0" />
-   <GridPane fx:id="gridPane" layoutX="8.0" layoutY="259.0" prefHeight="444.0" prefWidth="147.0">
+   <GridPane fx:id="gridPane" layoutX="8.0" layoutY="259.0" prefHeight="444.0" prefWidth="273.0">
      <columnConstraints>
-       <ColumnConstraints hgrow="SOMETIMES" maxWidth="72.0" minWidth="10.0" prefWidth="72.0" />
-       <ColumnConstraints hgrow="SOMETIMES" maxWidth="111.0" minWidth="10.0" prefWidth="75.0" />
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="89.0" minWidth="10.0" prefWidth="75.0" />
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="111.0" minWidth="10.0" prefWidth="72.0" />
+         <ColumnConstraints hgrow="SOMETIMES" maxWidth="111.0" minWidth="10.0" prefWidth="72.0" />
      </columnConstraints>
      <rowConstraints>
        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />

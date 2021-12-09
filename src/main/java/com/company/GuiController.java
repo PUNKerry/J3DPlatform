@@ -1,8 +1,9 @@
 package com.company;
 
 import com.company.base.Model;
-import com.company.base.ModelChange;
+import com.company.base.ModelForDrawing;
 import com.company.engine.Direction;
+import com.company.engine.RenderParams;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
@@ -13,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.Scene;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
@@ -21,22 +21,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class GuiController {
 
@@ -50,8 +46,8 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
-    private ModelChange model = null;
-    private final ArrayList<ModelChange> models = new ArrayList<>();
+    private final List<ModelForDrawing> models = new ArrayList<>();
+    private final List<RenderParams> params = new ArrayList<>();
 
     private Camera camera = new Camera(
             new Vector3(0, 0, 100),
@@ -74,17 +70,13 @@ public class GuiController {
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
+            final float[][] zBuffer = new float[(int) height][(int) width];
 
-            if (model != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, texture, (int) width, (int) height);
-            if(!models.isEmpty()){
-                models.forEach(model -> {
-                    Model m;
-                if(model.getChangingModel() != null){
-                    m = model.getChangingModel();
-                }else m = model.getInitialModel();
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
-                });
+            for (float[] row : zBuffer) {
+                Arrays.fill(row, Float.MAX_VALUE);
+            }
+            for (int modelIndex = 0; modelIndex < models.size(); modelIndex++) {
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
             }
         });
 
@@ -112,7 +104,8 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            models.add(new ModelChange(ObjReader.read(fileContent)));
+            models.add(new ModelForDrawing(ObjReader.read(fileContent)));
+            params.add(new RenderParams(false, true));
             gridPane.getRowConstraints().add(new RowConstraints(100));
             Button button = new Button("Active");
             button.setFont(new Font(15));
@@ -127,6 +120,9 @@ public class GuiController {
             label.setStyle("-fx-background-color: gray;");
             gridPane.add(label, 0, n);
             gridPane.add(button, 1, n);
+            Button addTexture = new Button("addTexture");
+            addTexture.setOnMouseClicked(mouseEvent -> addTextureToModel(n - 1));
+            gridPane.add(addTexture, 2, n);
         } catch (Exception e) {
             handle(e);
         }
@@ -140,138 +136,137 @@ public class GuiController {
 
     @FXML
     private void stretchX() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() + STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.XStretching(modelForDrawing.getXStretching() + STRETCH);
         });
     }
 
     @FXML
     private void stretchY() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() + STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.YStretching(modelForDrawing.getYStretching() + STRETCH);
         });
     }
 
     @FXML
     private void stretchZ() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() + STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.ZStretching(modelForDrawing.getZStretching() + STRETCH);
         });
     }
 
     @FXML
     private void pullItOffX() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() - STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.XStretching(modelForDrawing.getXStretching() - STRETCH);
         });
     }
 
     @FXML
     private void pullItOffY() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() - STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.YStretching(modelForDrawing.getYStretching() - STRETCH);
         });
     }
 
     @FXML
     private void pullItOffZ() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() - STRETCH);
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.ZStretching(modelForDrawing.getZStretching() - STRETCH);
         });
     }
 
     @FXML
     private void moveXInAPositiveDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(MOVE, 0, 0));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(MOVE, 0, 0));
         });
     }
 
     @FXML
     private void moveXInANegativeDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(-MOVE, 0, 0));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(-MOVE, 0, 0));
         });
     }
 
     @FXML
     private void moveYInAPositiveDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, MOVE, 0));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(0, MOVE, 0));
         });
     }
 
     @FXML
     private void moveYInANegativeDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, -MOVE, 0));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(0, -MOVE, 0));
         });
     }
 
     @FXML
     private void moveZInAPositiveDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, MOVE));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(0, 0, MOVE));
         });
     }
 
     @FXML
     private void moveZInANegativeDirection() {
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, -MOVE));
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.move(new Vector3(0, 0, -MOVE));
         });
     }
 
     @FXML
     private void rotateX() {
-        double[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
     @FXML
     private void rotateY() {
-        double[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
     @FXML
     private void rotateZ() {
-        double[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionX() {
-        double[][] m = {{1, 0, 0},{0, COS_A, -SIN_A},{0, SIN_A, COS_A}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{1, 0, 0},{0, COS_A, -SIN_A},{0, SIN_A, COS_A}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionY() {
-        double[][] m = {{COS_A, 0, -SIN_A},{0, 1, 0},{SIN_A, 0, COS_A}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{COS_A, 0, -SIN_A},{0, 1, 0},{SIN_A, 0, COS_A}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionZ() {
-        double[][] m = {{COS_A, -SIN_A, 0},{SIN_A, COS_A, 0},{0, 0, 1}};
-        models.forEach(modelChange -> {
-            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        float[][] m = {{COS_A, -SIN_A, 0},{SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelForDrawing -> {
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
         });
     }
 
-    @FXML
-    private void loadTextureOnClick() {
+    private void addTextureToModel(int n) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.png)", "*.png"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpeg)", "*.jpeg"));
@@ -282,9 +277,10 @@ public class GuiController {
         if (file == null) {
             return;
         }
-
         try {
-            texture = new Image(file.toString());
+            ModelForDrawing model = models.get(n);
+            params.get(n).drawTexture = true;
+            model.setTexture(new Image(file.toString()));
             model.triangulate();
         } catch (Exception e) {
             handle(e);
@@ -303,11 +299,11 @@ public class GuiController {
         }
 
         try {
-            Model m;
-            if(model.getChangingModel() != null){
-                m = model.getChangingModel();
-            }else m = model.getInitialModel();
-            ObjWriter.writeToFile(file, m);
+//            Model m;
+//            if(model.getChangingModel() != null){
+//                m = model.getChangingModel();
+//            }else m = model.getInitialModel();
+//            ObjWriter.writeToFile(file, m);
         } catch (Exception e) {
             handle(e);
         }
@@ -421,11 +417,13 @@ public class GuiController {
 
     @FXML
     public void triangulateModel(){
-        try {
-            model.triangulate();
-        } catch (Exception e) {
-            handle(e);
-        }
+        models.forEach(modelForDrawing -> {
+            try {
+                modelForDrawing.triangulate();
+            } catch (Exception e) {
+                handle(e);
+            }
+        });
     }
 
     public void activateModel(int n){

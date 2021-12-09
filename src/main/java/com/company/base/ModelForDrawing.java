@@ -2,8 +2,11 @@ package com.company.base;
 
 import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
+import javafx.scene.image.Image;
 
-public class ModelChange {
+import java.awt.*;
+
+public class ModelForDrawing {
     private final Model initialModel;
     private Model changingModel = null;
     private float xStretching = 1;
@@ -11,8 +14,9 @@ public class ModelChange {
     private float zStretching = 1;
     private Vector3 shift = new Vector3(0, 0, 0);
     private boolean isChangingNow = true;
+    private Image texture = null;
 
-    public ModelChange(Model initialModel) {
+    public ModelForDrawing(Model initialModel) {
         this.initialModel = initialModel;
     }
 
@@ -53,6 +57,11 @@ public class ModelChange {
         return initialModel;
     }
 
+    public Model getActualModel(){
+        if(changingModel != null) return changingModel;
+        return initialModel;
+    }
+
     public Vector3 getShift() {
         return shift;
     }
@@ -75,5 +84,18 @@ public class ModelChange {
 
     public void setChangingNow(boolean changingNow) {
         isChangingNow = changingNow;
+    }
+
+    public Image getTexture() {
+        return texture;
+    }
+
+    public void setTexture(Image texture) {
+        this.texture = texture;
+    }
+
+    public void triangulate() throws Exception {
+        initialModel.triangulate();
+        if(changingModel != null) changingModel.triangulate();
     }
 }
