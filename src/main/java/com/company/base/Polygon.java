@@ -51,11 +51,11 @@ public class Polygon {
             if (indicesOfVertexes.size() != 0) {
                 indicesOfVertexes.add(index);
             } else {
-                throw new PolygonException("Ошибка добавления вершины в полигон: для данного полигона нельзя добавить этот вид координат");
+                throw new PolygonException("Error adding a vertex to a polygon: this type of coordinates cannot be added for this polygon");
             }
         } else {
             if (indicesOfVertexes.size() != 0) {
-                throw new PolygonException("Ошибка добавления вершины в полигон: отсутствует вид координат, который необходим для данного полигона");
+                throw new PolygonException("Error adding a vertex to a polygon: there is no coordinate type that is necessary for this polygon");
             }
         }
     }

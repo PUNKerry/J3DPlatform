@@ -1,22 +1,30 @@
 package com.company;
 
 import com.company.base.Model;
+import com.company.base.ModelChange;
 import com.company.engine.Direction;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
 import com.company.files.obj.ObjWriter;
+import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
+import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -25,7 +33,9 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class GuiController {
@@ -40,10 +50,10 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
-    private Model model = null;
-    private Image texture = null;
+    private ModelChange model = null;
+    private final ArrayList<ModelChange> models = new ArrayList<>();
 
-    private final Camera camera = new Camera(
+    private Camera camera = new Camera(
             new Vector3(0, 0, 100),
             new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
@@ -67,12 +77,25 @@ public class GuiController {
 
             if (model != null) {
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, texture, (int) width, (int) height);
+            if(!models.isEmpty()){
+                models.forEach(model -> {
+                    Model m;
+                if(model.getChangingModel() != null){
+                    m = model.getChangingModel();
+                }else m = model.getInitialModel();
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, m, (int) width, (int) height);
+                });
             }
         });
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
+
+    @FXML
+    GridPane gridPane;
+
+    private final ArrayList<Button> buttons = new ArrayList<>();
 
     @FXML
     private void loadFileOnClick() {
@@ -89,10 +112,162 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            model = ObjReader.read(fileContent);
+            models.add(new ModelChange(ObjReader.read(fileContent)));
+            gridPane.getRowConstraints().add(new RowConstraints(100));
+            Button button = new Button("Active");
+            button.setFont(new Font(15));
+            button.setMinSize(100,70);
+            button.setStyle("-fx-background-color: gray;");
+            int n = models.size();
+            button.setOnMouseClicked(mouseEvent -> activateModel(n));
+            buttons.add(button);
+            Label label = new Label(" Model " + String.valueOf(n));
+            label.setMinSize(80,70);
+            label.setFont(new Font(15));
+            label.setStyle("-fx-background-color: gray;");
+            gridPane.add(label, 0, n);
+            gridPane.add(button, 1, n);
         } catch (Exception e) {
             handle(e);
         }
+
+    }
+    private static final float STRETCH = 0.01f;
+    private static final float MOVE = 2;
+    private static final float A = 0.02f;
+    private static final float COS_A = (float) Math.cos(A);
+    private static final float SIN_A = (float) Math.sin(A);
+
+    @FXML
+    private void stretchX() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() + STRETCH);
+        });
+    }
+
+    @FXML
+    private void stretchY() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() + STRETCH);
+        });
+    }
+
+    @FXML
+    private void stretchZ() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() + STRETCH);
+        });
+    }
+
+    @FXML
+    private void pullItOffX() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.XStretching(modelChange.getXStretching() - STRETCH);
+        });
+    }
+
+    @FXML
+    private void pullItOffY() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.YStretching(modelChange.getYStretching() - STRETCH);
+        });
+    }
+
+    @FXML
+    private void pullItOffZ() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.ZStretching(modelChange.getZStretching() - STRETCH);
+        });
+    }
+
+    @FXML
+    private void moveXInAPositiveDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(MOVE, 0, 0));
+        });
+    }
+
+    @FXML
+    private void moveXInANegativeDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(-MOVE, 0, 0));
+        });
+    }
+
+    @FXML
+    private void moveYInAPositiveDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, MOVE, 0));
+        });
+    }
+
+    @FXML
+    private void moveYInANegativeDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, -MOVE, 0));
+        });
+    }
+
+    @FXML
+    private void moveZInAPositiveDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, MOVE));
+        });
+    }
+
+    @FXML
+    private void moveZInANegativeDirection() {
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.move(new Vector3(0, 0, -MOVE));
+        });
+    }
+
+    @FXML
+    private void rotateX() {
+        double[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateY() {
+        double[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateZ() {
+        double[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionX() {
+        double[][] m = {{1, 0, 0},{0, COS_A, -SIN_A},{0, SIN_A, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionY() {
+        double[][] m = {{COS_A, 0, -SIN_A},{0, 1, 0},{SIN_A, 0, COS_A}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
+    }
+
+    @FXML
+    private void rotateInTheOppositeDirectionZ() {
+        double[][] m = {{COS_A, -SIN_A, 0},{SIN_A, COS_A, 0},{0, 0, 1}};
+        models.forEach(modelChange -> {
+            if(modelChange.isChangingNow()) modelChange.rotation(new Matrix3(m));
+        });
     }
 
     @FXML
@@ -128,42 +303,29 @@ public class GuiController {
         }
 
         try {
-            ObjWriter.writeToFile(file, model);
+            Model m;
+            if(model.getChangingModel() != null){
+                m = model.getChangingModel();
+            }else m = model.getInitialModel();
+            ObjWriter.writeToFile(file, m);
         } catch (Exception e) {
             handle(e);
         }
     }
 
     public void handle(Exception exception) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
-        Label label = new Label("       " + exception.getMessage() + "      ");
-        label.setFont(new Font(20));
-        label.setMinSize(100, 70);
+        alert.setTitle("Exception");
+        alert.setHeaderText(null);
+        alert.setContentText(exception.getMessage());
 
-        StackPane pane = new StackPane();
-        pane.getChildren().add(label);
-
-        Scene scene = new Scene(pane);
-
-        Stage newWindow = new Stage();
-        newWindow.setTitle("Ошибка");
-        newWindow.setScene(scene);
-        newWindow.sizeToScene();
-        newWindow.setResizable(false);
-
-        newWindow.setX(Screen.getPrimary().getBounds().getWidth()/2);
-        newWindow.setY(Screen.getPrimary().getBounds().getHeight()/2);
-
-        newWindow.initModality(Modality.WINDOW_MODAL);
-
-        newWindow.setX(1000);
-        newWindow.setY(700);
-
-        newWindow.show();
+        alert.showAndWait();
     }
 
     private long lastEventTime = 0;
     private Direction lastEventDirection = Direction.FORWARD;
+    private boolean cameraMoved = true;
 
     private void changeTranslation(Direction direction) {
         long now = new Date().getTime();
@@ -264,5 +426,38 @@ public class GuiController {
         } catch (Exception e) {
             handle(e);
         }
+    }
+
+    public void activateModel(int n){
+        if(models.size() >= n) {
+            models.get(n - 1).setChangingNow(!models.get(n - 1).isChangingNow());
+            if(models.get(n - 1).isChangingNow()) buttons.get(n - 1).setText("Active");
+            else buttons.get(n - 1).setText("Not active");
+        }
+    }
+
+    @FXML
+    public void activate1Model(ActionEvent actionEvent) {
+       activateModel(1);
+    }
+
+    @FXML
+    public void activate2Model(ActionEvent actionEvent) {
+        activateModel(2);
+    }
+
+    @FXML
+    public void activate3Model(ActionEvent actionEvent) {
+        activateModel(3);
+    }
+
+    @FXML
+    public void activate4Model(ActionEvent actionEvent) {
+        activateModel(4);
+    }
+
+    @FXML
+    public void activate5Model(ActionEvent actionEvent) {
+        activateModel(5);
     }
 }

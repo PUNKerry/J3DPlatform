@@ -30,7 +30,6 @@ public class J3DPlatform extends Application {
     public void start(Stage stage) throws Exception {
 
         AnchorPane viewport = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("fxml" + File.separator + "gui.fxml")));
-
         this.stage = stage;
 
         sceneSettings();
