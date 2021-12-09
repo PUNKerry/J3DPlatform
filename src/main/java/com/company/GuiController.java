@@ -418,6 +418,4 @@ public class GuiController {
     public void activate5Model(ActionEvent actionEvent) {
         activateModel(5);
     }
-
-
 }
