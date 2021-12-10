@@ -4,6 +4,7 @@ import com.company.base.Model;
 import com.company.base.ModelForDrawing;
 import com.company.engine.Direction;
 import com.company.engine.RenderParams;
+import com.company.exceptions.RenderException;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
@@ -76,7 +77,11 @@ public class GuiController {
                 Arrays.fill(row, Float.MAX_VALUE);
             }
             for (int modelIndex = 0; modelIndex < models.size(); modelIndex++) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
+                try {
+                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
+                } catch (RenderException e) {
+                    handle(e);
+                }
             }
         });
 

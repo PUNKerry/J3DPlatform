@@ -27,7 +27,7 @@ public class RenderEngine {
             final RenderParams params,
             final int width,
             final int height,
-            final float[][] zBuffer) {
+            final float[][] zBuffer) throws RenderException {
         Model model = modelForDrawing.getActualModel();
         Image texture = modelForDrawing.getTexture();
         Matrix4 modelMatrix = rotateScaleTranslate();
@@ -72,10 +72,10 @@ public class RenderEngine {
 
             if (params.drawTexture) {
                 if (!model.isTexturesInPolygons()) {
-                    //throw new RenderException("....");
+                    throw new RenderException("....");
                 }
                 if (texture == null) {
-                    //throw new RenderException("....");
+                    throw new RenderException("....");
                 }
                 vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p0)));
                 vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p1)));
