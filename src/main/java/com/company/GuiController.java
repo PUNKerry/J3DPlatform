@@ -7,6 +7,7 @@ import com.company.engine.RenderParams;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
+import com.company.files.obj.ObjWriter;
 import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
@@ -78,6 +79,7 @@ public class GuiController {
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
             }
         });
+
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
@@ -102,33 +104,74 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            Model newModel = ObjReader.read(fileContent);
-            newModel.triangulate();
-            models.add(new ModelForDrawing(newModel));
-            params.add(new RenderParams(false, true));
+            ModelForDrawing model = new ModelForDrawing(ObjReader.read(fileContent));
+            model.triangulate();
+            models.add(model);
+            RenderParams param = new RenderParams(false, true);
+            params.add(param);
+
             gridPane.getRowConstraints().add(new RowConstraints(100));
+
+            int n = models.size();
+
             Button button = new Button("Active");
             button.setFont(new Font(15));
             button.setMinSize(100,70);
             button.setStyle("-fx-background-color: gray;");
-            int n = models.size();
-            button.setOnMouseClicked(mouseEvent -> activateModel(n));
+            button.setOnMouseClicked(mouseEvent -> activateModel(n, model));
             buttons.add(button);
+            gridPane.add(button, 1, n);
+
             Label label = new Label(" Model " + String.valueOf(n));
             label.setMinSize(80,70);
             label.setFont(new Font(15));
             label.setStyle("-fx-background-color: gray;");
             gridPane.add(label, 0, n);
-            gridPane.add(button, 1, n);
+
             Button addTexture = new Button("addTexture");
-            addTexture.setOnMouseClicked(mouseEvent -> addTextureToModel(n - 1));
+            addTexture.setFont(new Font(15));
+            addTexture.setMinSize(100,70);
+            addTexture.setStyle("-fx-background-color: gray;");
+            addTexture.setOnMouseClicked(mouseEvent -> addTextureToModel(model, param));
             gridPane.add(addTexture, 2, n);
+
+            Button drawMesh = new Button("DrawMesh");
+            drawMesh.setFont(new Font(14));
+            drawMesh.setMinSize(100,75);
+            drawMesh.setStyle("-fx-background-color: gray;");
+            drawMesh.setOnMouseClicked(mouseEvent -> {
+                param.drawMesh = !param.drawMesh;
+                if (param.drawMesh) {
+                    drawMesh.setText("DrawMesh");
+                }
+                else {
+                    drawMesh.setText("NotDrawMesh");
+                }
+            });
+            gridPane.add(drawMesh, 4, n);
+
+            Button drawTexture = new Button("NotDrawTexture");
+            drawTexture.setFont(new Font(14));
+            drawTexture.setMinSize(100,75);
+            drawTexture.setStyle("-fx-background-color: gray;");
+            drawTexture.setOnMouseClicked(mouseEvent -> {
+                param.drawTexture = !param.drawTexture;
+                if (param.drawTexture) {
+                    drawTexture.setText("DrawTexture");
+                }
+                else {
+                    drawTexture.setText("NotDrawTexture");
+                }
+            });
+            gridPane.add(drawTexture, 3, n);
+
+
+
         } catch (Exception e) {
             handle(e);
         }
+
     }
-
-
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
     private static final float A = 0.02f;
@@ -267,7 +310,7 @@ public class GuiController {
         });
     }
 
-    private void addTextureToModel(int n) {
+    private void addTextureToModel(ModelForDrawing model, RenderParams params) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.png)", "*.png"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpeg)", "*.jpeg"));
@@ -281,8 +324,7 @@ public class GuiController {
             return;
         }
         try {
-            ModelForDrawing model = models.get(n);
-            params.get(n).drawTexture = true;
+            params.drawTexture = true;
             model.setTexture(new Image(file.toString()));
             model.triangulate();
         } catch (Exception e) {
@@ -302,11 +344,11 @@ public class GuiController {
         }
 
         try {
-//            Model m;
-//            if(model.getChangingModel() != null){
-//                m = model.getChangingModel();
-//            }else m = model.getInitialModel();
-//            ObjWriter.writeToFile(file, m);
+            Model m = new Model();
+            models.forEach(modelForDrawing -> {
+                m.addModel(modelForDrawing.getActualModel());
+            });
+            ObjWriter.writeToFile(file, m);
         } catch (Exception e) {
             handle(e);
         }
@@ -428,36 +470,11 @@ public class GuiController {
         });
     }
 
-    public void activateModel(int n){
-        if (models.size() >= n) {
-            models.get(n - 1).setChangingNow(!models.get(n - 1).isChangingNow());
-            if(models.get(n - 1).isChangingNow()) buttons.get(n - 1).setText("Active");
+    public void activateModel(int n, ModelForDrawing model){
+
+            model.setChangingNow(!model.isChangingNow());
+            if(model.isChangingNow()) buttons.get(n - 1).setText("Active");
             else buttons.get(n - 1).setText("Not active");
-        }
-    }
 
-    @FXML
-    public void activate1Model(ActionEvent actionEvent) {
-       activateModel(1);
-    }
-
-    @FXML
-    public void activate2Model(ActionEvent actionEvent) {
-        activateModel(2);
-    }
-
-    @FXML
-    public void activate3Model(ActionEvent actionEvent) {
-        activateModel(3);
-    }
-
-    @FXML
-    public void activate4Model(ActionEvent actionEvent) {
-        activateModel(4);
-    }
-
-    @FXML
-    public void activate5Model(ActionEvent actionEvent) {
-        activateModel(5);
     }
 }

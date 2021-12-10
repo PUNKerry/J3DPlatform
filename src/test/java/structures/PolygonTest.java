@@ -125,4 +125,16 @@ public class PolygonTest {
             Assertions.assertEquals(triangulated.countOfVertices(), 3);
         }
     }
+
+    @Test
+    void testShiftIndexes() throws Exception {
+        Polygon p1 = new Polygon();
+        p1.addNewVertex(1,1,1);
+
+        Polygon p2 = new Polygon();
+        p2.addNewVertex(2,2,2);
+
+        p1.shiftIndexes(1, 1, 1);
+        Assertions.assertEquals(p1, p2);
+    }
 }

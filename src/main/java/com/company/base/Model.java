@@ -154,4 +154,12 @@ public class Model {
         vertices = vertices.stream().map(s -> s = rotationMatrix.multiplyingOnVector(s)).collect(Collectors.toList());
         Shift(shift);
     }
+
+    public void addModel(Model model){
+        model.polygons.forEach(p -> p.shiftIndexes(this.vertices.size(), this.textureVertices.size(), this.normals.size()));
+        this.polygons.addAll(model.polygons);
+        this.vertices.addAll(model.vertices);
+        this.textureVertices.addAll(model.textureVertices);
+        this.normals.addAll(model.normals);
+    }
 }
