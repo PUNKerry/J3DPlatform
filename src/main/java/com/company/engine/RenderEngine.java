@@ -3,6 +3,7 @@ package com.company.engine;
 import com.company.base.Model;
 import com.company.base.ModelForDrawing;
 import com.company.base.Polygon;
+import com.company.exceptions.RenderException;
 import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector2;
@@ -69,7 +70,13 @@ public class RenderEngine {
             Vector2 vt1 = null;
             Vector2 vt2 = null;
 
-            if (model.isTexturesInPolygons()) {
+            if (params.drawTexture) {
+                if (!model.isTexturesInPolygons()) {
+                    //throw new RenderException("....");
+                }
+                if (texture == null) {
+                    //throw new RenderException("....");
+                }
                 vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p0)));
                 vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p1)));
                 vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p2)));
