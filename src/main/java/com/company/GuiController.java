@@ -7,7 +7,6 @@ import com.company.engine.RenderParams;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
-import com.company.files.obj.ObjWriter;
 import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
@@ -79,7 +78,6 @@ public class GuiController {
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
             }
         });
-
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
@@ -104,7 +102,9 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            models.add(new ModelForDrawing(ObjReader.read(fileContent)));
+            Model newModel = ObjReader.read(fileContent);
+            newModel.triangulate();
+            models.add(new ModelForDrawing(newModel));
             params.add(new RenderParams(false, true));
             gridPane.getRowConstraints().add(new RowConstraints(100));
             Button button = new Button("Active");
@@ -126,8 +126,9 @@ public class GuiController {
         } catch (Exception e) {
             handle(e);
         }
-
     }
+
+
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
     private static final float A = 0.02f;
@@ -271,6 +272,8 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.png)", "*.png"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpeg)", "*.jpeg"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpg)", "*.jpg"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.tga)", "*.tga"));
+        //todo: optimize it
         fileChooser.setTitle("Load Texture");
 
         File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
@@ -321,7 +324,6 @@ public class GuiController {
 
     private long lastEventTime = 0;
     private Direction lastEventDirection = Direction.FORWARD;
-    private boolean cameraMoved = true;
 
     private void changeTranslation(Direction direction) {
         long now = new Date().getTime();
@@ -427,7 +429,7 @@ public class GuiController {
     }
 
     public void activateModel(int n){
-        if(models.size() >= n) {
+        if (models.size() >= n) {
             models.get(n - 1).setChangingNow(!models.get(n - 1).isChangingNow());
             if(models.get(n - 1).isChangingNow()) buttons.get(n - 1).setText("Active");
             else buttons.get(n - 1).setText("Not active");

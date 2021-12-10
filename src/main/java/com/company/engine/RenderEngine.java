@@ -13,7 +13,6 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.company.engine.GraphicConveyor.*;
@@ -27,8 +26,7 @@ public class RenderEngine {
             final RenderParams params,
             final int width,
             final int height,
-            final float[][] zBuffer)
-    {
+            final float[][] zBuffer) {
         Model model = modelForDrawing.getActualModel();
         Image texture = modelForDrawing.getTexture();
         Matrix4 modelMatrix = rotateScaleTranslate();
@@ -38,8 +36,6 @@ public class RenderEngine {
         Matrix4 modelViewProjectionMatrix = new Matrix4(modelMatrix);
         modelViewProjectionMatrix.mul(viewMatrix);
         modelViewProjectionMatrix.mul(projectionMatrix);
-
-
 
         for (int polygonInd = 0; polygonInd < model.getCountOfPolygons(); ++polygonInd) {
             final Polygon polygon = model.getPolygon(polygonInd);
@@ -97,6 +93,9 @@ public class RenderEngine {
                     drawDownDirected(pixelWriter, texture, zBuffer, p2, p3, p1, vt2, vt3, vt1, params);
                 }
             }
+            if (params.drawMesh) {
+                drawTriangle(pixelWriter, zBuffer, Color.rgb(0, 0, 0, 1.0), p0, p1, p2);
+            }
         }
     }
 
@@ -105,6 +104,9 @@ public class RenderEngine {
                                        Vector2 vt0, Vector2 vt1, Vector2 vt2,
                                        RenderParams params) {
         for (int row = (int) Math.ceil(p0.y); row <= Math.floor(p1.y); row++) {
+            if (row < 0 || row >= zBuffer.length) {
+                continue;
+            }
             draw(pixelWriter, texture, zBuffer, p0, p1, p2, vt0, vt1, vt2, row, params);
         }
     }
@@ -114,18 +116,11 @@ public class RenderEngine {
                                          Vector2 vt0, Vector2 vt1, Vector2 vt2,
                                          RenderParams params) {
         for (int row = (int) Math.floor(p0.y); row >= Math.ceil(p1.y); row--) {
+            if (row < 0 || row >= zBuffer.length) {
+                continue;
+            }
             draw(pixelWriter, texture, zBuffer, p0, p1, p2, vt0, vt1, vt2, row, params);
         }
-    }
-
-    private static void draw(PixelWriter pixelWriter, Vector3 p0, Vector3 p1, Vector3 p2, int row) { // without texture (single color)
-        float left = calcFormulaX(p0.toVector2(), p1.toVector2(), row);
-        float right = calcFormulaX(p0.toVector2(), p2.toVector2(), row);
-        for (int col = Math.round(left); col <= Math.round(right); col++) {
-            pixelWriter.setColor(col, row, Color.rgb(113,255,73,1.0));
-        }
-        pixelWriter.setColor(Math.round(left), row, Color.rgb(0,0,0,1.0));
-        pixelWriter.setColor(Math.round(right), row, Color.rgb(0,0,0,1.0));
     }
 
     private static void draw(PixelWriter pixelWriter, Image texture, float[][] zBuffer,
@@ -135,14 +130,15 @@ public class RenderEngine {
         float left = calcFormulaX(p0.toVector2(), p1.toVector2(), row);
         float right = calcFormulaX(p0.toVector2(), p2.toVector2(), row);
         for (int col = (int) Math.ceil(left); col <= Math.floor(right); col++) {
-            if (params.drawTexture) {
-                if (col < 0 || row < 0 || row >= zBuffer.length || col >= zBuffer[0].length) {
-                    continue;
-                }
-                Vector2 o = new Vector2(col, row);
-                float z = calcZOnSurface(p0, p1, p2, o);
-                if (zBuffer[row][col] > z) {
-                    zBuffer[row][col] = z;
+            if (row < 0 || row >= zBuffer.length || col < 0 || col >= zBuffer[0].length) {
+                continue;
+            }
+            Vector2 o = new Vector2(col, row);
+            float z = calcZOnSurface(p0, p1, p2, o);
+            if (zBuffer[row][col] > z) {
+                zBuffer[row][col] = z;
+                Color color = null;
+                if (params.drawTexture) {
                     Vector2 dp1 = p1.subtraction(p0).toVector2();
                     Vector2 dp2 = p2.subtraction(p0).toVector2();
                     Vector2 dO = o.subtraction(p0.toVector2());
@@ -152,18 +148,54 @@ public class RenderEngine {
                             vt0.y * (1 - alpha - beta) + vt1.y * alpha + vt2.y * beta);
                     pointOnTexture.x = pointOnTexture.x * (float) texture.getWidth();
                     pointOnTexture.y = (float) texture.getHeight() * (1 - pointOnTexture.y);
-                    Color color = texture.getPixelReader().getColor((int) Math.floor(pointOnTexture.x),
+                    color = texture.getPixelReader().getColor((int) Math.floor(pointOnTexture.x),
                             (int) Math.floor(pointOnTexture.y));
+                } else {
+                    //color = Color.rgb(113, 255, 73, 1.0);
+                    color = Color.rgb(244, 244, 244, 1.0);
+                }
+                pixelWriter.setColor((int) o.x, (int) o.y, color);
+            }
+        }
+    }
+
+    private static void drawTriangle(PixelWriter pixelWriter, float[][] zBuffer,
+                                     Color color,
+                                     Vector3 p0, Vector3 p1, Vector3 p2) {
+        drawLine(pixelWriter, zBuffer, color, p0, p1, p2);
+        drawLine(pixelWriter, zBuffer, color, p1, p2, p0);
+        drawLine(pixelWriter, zBuffer, color, p2, p0, p1);
+    }
+
+    private static void drawLine(PixelWriter pixelWriter, float[][] zBuffer,
+                                 Color color,
+                                 Vector3 p0, Vector3 p1, Vector3 p2) {
+        Vector2 dir = p1.subtraction(p0).toVector2();
+        float k = Math.abs(dir.y / dir.x);
+        if (Float.isNaN(k) || k > 1) {
+            for (int row = (int) Math.floor(Math.min(p0.y, p1.y)); row <= Math.ceil(Math.max(p0.y, p1.y)); row++) {
+                int col = (int) Math.ceil(calcFormulaX(p0.toVector2(), p1.toVector2(), row));
+                if (row < 0 || row >= zBuffer.length || col < 0 || col >= zBuffer[0].length) {
+                    continue;
+                }
+                float z = calcZOnSurface(p0, p1, p2, new Vector2(col, row));
+                if (zBuffer[row][col] >= z) {
+                    zBuffer[row][col] = z;
                     pixelWriter.setColor(col, row, color);
                 }
             }
-            else{
-                pixelWriter.setColor(col, row, Color.rgb(113,255,73,1.0));
+        } else {
+            for (int col = (int) Math.floor(Math.min(p0.x, p1.x)); col <= Math.ceil(Math.max(p0.x, p1.x)); col++) {
+                int row = (int) Math.ceil(calcFormulaY(p0.toVector2(), p1.toVector2(), col));
+                if (row < 0 || row >= zBuffer.length || col < 0 || col >= zBuffer[0].length) {
+                    continue;
+                }
+                float z = calcZOnSurface(p0, p1, p2, new Vector2(col, row));
+                if (zBuffer[row][col] >= z) {
+                    zBuffer[row][col] = z;
+                    pixelWriter.setColor(col, row, color);
+                }
             }
-        }
-        if (false) { //todo: condition from parameters
-            pixelWriter.setColor(Math.round(left), row, Color.rgb(0,0,0,1.0));
-            pixelWriter.setColor(Math.round(right), row, Color.rgb(0,0,0,1.0));
         }
     }
 
@@ -171,6 +203,12 @@ public class RenderEngine {
                                       final Vector2 p1,
                                       final float y) {
         return (y - p0.y) * (p1.x - p0.x) / (p1.y - p0.y) + p0.x;
+    }
+
+    private static float calcFormulaY(final Vector2 p0,
+                                      final Vector2 p1,
+                                      final float x) {
+        return (x - p0.x) * (p1.y - p0.y) / (p1.x - p0.x) + p0.y;
     }
 
     private static float calcFormulaZ(final Vector3 p1,

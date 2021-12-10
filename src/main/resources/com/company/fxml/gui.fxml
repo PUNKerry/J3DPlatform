@@ -18,11 +18,6 @@
                     <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
-<!--            <MenuItem mnemonicParsing="false" onAction="#addTextureToModel" text="Load Texture">-->
-<!--                <accelerator>-->
-<!--                    <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />-->
-<!--                </accelerator>-->
-<!--            </MenuItem>-->
         </Menu>
         <Menu mnemonicParsing="false" text="Model">
             <MenuItem mnemonicParsing="false" onAction="#triangulateModel" text="Triangulate">
