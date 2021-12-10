@@ -4,14 +4,21 @@ import com.company.exceptions.PolygonException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Polygon {
 
-    private final List<Integer> indicesVertexes = new ArrayList<>();
-    private final List<Integer> indicesTextureVertexes = new ArrayList<>();
-    private final List<Integer> indicesNormalVertexes = new ArrayList<>();
+    private List<Integer> indicesVertexes = new ArrayList<>();
+    private List<Integer> indicesTextureVertexes = new ArrayList<>();
+    private List<Integer> indicesNormalVertexes = new ArrayList<>();
 
     public Polygon() {
+    }
+
+    public void shiftIndexes(int v, int vt, int vn){
+        indicesVertexes = indicesVertexes.stream().map(i -> i += v).collect(Collectors.toList());
+        indicesTextureVertexes = indicesTextureVertexes.stream().map(i -> i += vt).collect(Collectors.toList());
+        indicesNormalVertexes = indicesNormalVertexes.stream().map(i -> i += vn).collect(Collectors.toList());
     }
 
     public int getVertexIndex(final int index) {
