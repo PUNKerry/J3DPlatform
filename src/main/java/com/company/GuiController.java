@@ -144,8 +144,8 @@ public class GuiController {
             gridPane.add(addTexture, 2, n);
 
             Button drawMesh = new Button("DrawMesh");
-            drawMesh.setFont(new Font(14));
-            drawMesh.setMinSize(100,75);
+            drawMesh.setFont(new Font(15));
+            drawMesh.setMinSize(115,70);
             drawMesh.setStyle("-fx-background-color: gray;");
             drawMesh.setOnMouseClicked(mouseEvent -> {
                 param.drawMesh = !param.drawMesh;
@@ -157,11 +157,6 @@ public class GuiController {
                 }
             });
             gridPane.add(drawMesh, 3, n);
-
-
-
-
-
         } catch (Exception e) {
             handle(e);
         }
@@ -171,7 +166,7 @@ public class GuiController {
     private void textureButton(RenderParams param, int n){
         Button drawTexture = new Button("NotDrawTexture");
         drawTexture.setFont(new Font(14));
-        drawTexture.setMinSize(100,75);
+        drawTexture.setMinSize(100,70);
         drawTexture.setStyle("-fx-background-color: gray;");
         drawTexture.setOnMouseClicked(mouseEvent -> {
             param.drawTexture = !param.drawTexture;
@@ -325,11 +320,7 @@ public class GuiController {
 
     private void addTextureToModel(ModelForDrawing model, RenderParams params) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.png)", "*.png"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpeg)", "*.jpeg"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.jpg)", "*.jpg"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.tga)", "*.tga"));
-        //todo: optimize it
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image (*.png),(*.jpeg),(*.jpg),(*.tga)", "*.png", "*.jpeg", "*.jpg", "*.tga"));
         fileChooser.setTitle("Load Texture");
 
         File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
