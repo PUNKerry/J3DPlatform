@@ -72,10 +72,10 @@ public class RenderEngine {
 
             if (params.drawTexture) {
                 if (!model.isTexturesInPolygons()) {
-                    throw new RenderException("....");
+                    throw new RenderException("Can not draw model without texture coordinates");
                 }
                 if (texture == null) {
-                    throw new RenderException("....");
+                    throw new RenderException("Can not draw model without texture");
                 }
                 vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p0)));
                 vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p1)));
@@ -89,9 +89,12 @@ public class RenderEngine {
             } else {
                 Vector3 p3 = new Vector3(calcFormulaX(p0.toVector2(), p2.toVector2(), p1.y), p1.y, calcFormulaZ(p0, p2, p1.y));
                 float scale = p3.subtraction(p0).length() / p2.subtraction(p0).length();
-                Vector2 vt3 = vt2.subtraction(vt0);
-                vt3.multiplyingAVectorByAScalar(scale);
-                vt3 = vt3.sum(vt0);
+                Vector2 vt3 = null;
+                if (params.drawTexture) {
+                    vt3 = vt2.subtraction(vt0);
+                    vt3.multiplyingAVectorByAScalar(scale);
+                    vt3 = vt3.sum(vt0);
+                }
                 if (p1.x < p3.x) {
                     drawUpDirected(pixelWriter, texture, zBuffer, p0, p1, p3, vt0, vt1, vt3, params);
                     drawDownDirected(pixelWriter, texture, zBuffer, p2, p1, p3, vt2, vt1, vt3, params);

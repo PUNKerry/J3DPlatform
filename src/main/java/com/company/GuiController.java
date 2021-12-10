@@ -137,7 +137,10 @@ public class GuiController {
             addTexture.setFont(new Font(15));
             addTexture.setMinSize(100,70);
             addTexture.setStyle("-fx-background-color: gray;");
-            addTexture.setOnMouseClicked(mouseEvent -> addTextureToModel(model, param));
+            addTexture.setOnMouseClicked(mouseEvent -> {
+                addTextureToModel(model, param);
+                textureButton(param, n);
+            });
             gridPane.add(addTexture, 2, n);
 
             Button drawMesh = new Button("DrawMesh");
@@ -153,22 +156,9 @@ public class GuiController {
                     drawMesh.setText("NotDrawMesh");
                 }
             });
-            gridPane.add(drawMesh, 4, n);
+            gridPane.add(drawMesh, 3, n);
 
-            Button drawTexture = new Button("NotDrawTexture");
-            drawTexture.setFont(new Font(14));
-            drawTexture.setMinSize(100,75);
-            drawTexture.setStyle("-fx-background-color: gray;");
-            drawTexture.setOnMouseClicked(mouseEvent -> {
-                param.drawTexture = !param.drawTexture;
-                if (param.drawTexture) {
-                    drawTexture.setText("DrawTexture");
-                }
-                else {
-                    drawTexture.setText("NotDrawTexture");
-                }
-            });
-            gridPane.add(drawTexture, 3, n);
+
 
 
 
@@ -177,6 +167,24 @@ public class GuiController {
         }
 
     }
+
+    private void textureButton(RenderParams param, int n){
+        Button drawTexture = new Button("NotDrawTexture");
+        drawTexture.setFont(new Font(14));
+        drawTexture.setMinSize(100,75);
+        drawTexture.setStyle("-fx-background-color: gray;");
+        drawTexture.setOnMouseClicked(mouseEvent -> {
+            param.drawTexture = !param.drawTexture;
+            if (param.drawTexture) {
+                drawTexture.setText("DrawTexture");
+            }
+            else {
+                drawTexture.setText("NotDrawTexture");
+            }
+        });
+        gridPane.add(drawTexture, 4, n);
+    }
+
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
     private static final float A = 0.02f;
@@ -425,7 +433,7 @@ public class GuiController {
     }
 
     @FXML
-    public void handleCameraDown() {
+    public void handleCameraDown(ActionEvent actionEvent) {
         Direction nowDirection = Direction.DOWN;
         changeTranslation(nowDirection);
         camera.movePosition(nowDirection, -translation);
