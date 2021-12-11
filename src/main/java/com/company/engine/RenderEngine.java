@@ -104,7 +104,11 @@ public class RenderEngine {
                 }
             }
             if (params.drawMesh) {
-                drawTriangle(pixelWriter, zBuffer, Color.rgb(0, 0, 0, 1.0), p0, p1, p2);
+                if(modelForDrawing.isChangingNow()){
+                    drawTriangle(pixelWriter, zBuffer, Color.rgb(100, 10, 100, 1.0), p0, p1, p2);
+                }else {
+                    drawTriangle(pixelWriter, zBuffer, Color.rgb(0, 0, 0, 1.0), p0, p1, p2);
+                }
             }
         }
     }
