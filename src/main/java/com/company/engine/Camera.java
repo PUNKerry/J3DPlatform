@@ -1,5 +1,6 @@
 package com.company.engine;
 
+import com.company.gui.Direction;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector3;
 import com.company.math.vector.Vector4;

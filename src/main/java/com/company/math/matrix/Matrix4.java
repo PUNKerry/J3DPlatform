@@ -2,7 +2,6 @@ package com.company.math.matrix;
 
 import com.company.math.vector.Vector4;
 
-import javax.vecmath.Matrix4f;
 import java.util.Arrays;
 
 public class Matrix4 {
@@ -105,7 +104,7 @@ public class Matrix4 {
     public Vector4 multiplyingOnVector(Vector4 v){
         float[] m = new float[4];
         for (int i = 0; i < 4; i++) {
-            m[i] =  matrix[i][0] * v.x + matrix[i][1] * v.y + matrix[i][2] * v.z + matrix[i][3] * v.k;
+            m[i] =  matrix[i][0] * v.x + matrix[i][1] * v.y + matrix[i][2] * v.z + matrix[i][3] * v.w;
         }
         return new Vector4(m[0], m[1], m[2], m[3]);
     }
@@ -113,20 +112,20 @@ public class Matrix4 {
     protected float determinant4(float[][] m){
         float res = 0;
         float[][] d = {{m[1][1], m[1][2], m[1][3]},
-                {m[2][1], m[2][2], m[2][3]},
-                {m[3][1], m[3][2], m[3][3]}};
+                       {m[2][1], m[2][2], m[2][3]},
+                       {m[3][1], m[3][2], m[3][3]}};
         res += m[0][0] * Matrix3.determinant3(d);
         float[][] d2 = {{m[1][0], m[1][2], m[1][3]},
-                {m[2][0], m[2][2], m[2][3]},
-                {m[3][0], m[3][2], m[3][3]}};
+                        {m[2][0], m[2][2], m[2][3]},
+                        {m[3][0], m[3][2], m[3][3]}};
         res -= m[0][1] * Matrix3.determinant3(d2);
         float[][] d3 = {{m[1][0], m[1][1], m[1][3]},
-                {m[2][0], m[2][1], m[2][3]},
-                {m[3][0], m[3][1], m[3][3]}};
+                        {m[2][0], m[2][1], m[2][3]},
+                        {m[3][0], m[3][1], m[3][3]}};
         res += m[0][2] * Matrix3.determinant3(d3);
         float[][] d4 = {{m[1][0], m[1][1], m[1][2]},
-                {m[2][0], m[2][1], m[2][2]},
-                {m[3][0], m[3][1], m[3][2]}};
+                        {m[2][0], m[2][1], m[2][2]},
+                        {m[3][0], m[3][1], m[3][2]}};
         res -= m[0][3] * Matrix3.determinant3(d4);
         return res;
     }
@@ -150,7 +149,7 @@ public class Matrix4 {
         for (int i = 0; i < 4; i++) {
             matrix[3][i] -= matrix[0][i] * n;
         }
-        v.k -= v.x * n;
+        v.w -= v.x * n;
 
         n = matrix[2][1]/matrix[1][1];
         for (int i = 1; i < 4; i++) {
@@ -161,15 +160,15 @@ public class Matrix4 {
         for (int i = 1; i < 4; i++) {
             matrix[3][i] -= matrix[1][i] * n;
         }
-        v.k -= v.y * n;
+        v.w -= v.y * n;
 
         n = matrix[3][2]/matrix[2][2];
         for (int i = 2; i < 4; i++) {
             matrix[3][i] -= matrix[2][i] * n;
         }
-        v.k -= v.z * n;
+        v.w -= v.z * n;
 
-        float k = v.k / matrix[3][3];
+        float k = v.w / matrix[3][3];
         v.z -= matrix[2][3] * k;
         float z = v.z / matrix[2][2];
         v.y -= matrix[1][2] * z;
@@ -221,7 +220,7 @@ public class Matrix4 {
         this.matrix[3][2] = var16;
         this.matrix[3][3] = var17;
     }
-
+    
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(matrix);

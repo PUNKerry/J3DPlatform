@@ -13,11 +13,12 @@ public class Matrix3 {
         }
     }
 
-    public float[] getVerticals(int index) {
+    public float[] getVerticles(int index) {
         float[] toReturn = new float[3];
         for (int i = 0; i < 3; i++) {
             toReturn[i] = matrix[i][index];
         }
+
         return toReturn;
     }
 

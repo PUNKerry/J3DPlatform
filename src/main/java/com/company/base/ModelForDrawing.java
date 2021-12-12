@@ -4,8 +4,6 @@ import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.scene.image.Image;
 
-import java.awt.*;
-
 public class ModelForDrawing {
     private final Model initialModel;
     private Model changingModel = null;
@@ -23,7 +21,7 @@ public class ModelForDrawing {
     public void move(Vector3 v){
         shift = shift.sum(v);
         if(changingModel == null) changingModel = initialModel.clone();
-        changingModel.Shift(v);
+        changingModel.shift(v);
     }
 
     public void XStretching(float n){
@@ -97,5 +95,10 @@ public class ModelForDrawing {
     public void triangulate() throws Exception {
         initialModel.triangulate();
         if(changingModel != null) changingModel.triangulate();
+    }
+
+    public void reCalcNormals(){
+        initialModel.reCalcNormals();
+        if(changingModel != null) changingModel.reCalcNormals();
     }
 }

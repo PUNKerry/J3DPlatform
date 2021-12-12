@@ -1,9 +1,8 @@
-package com.company;
+package com.company.gui;
 
 import com.company.base.Model;
 import com.company.base.ModelForDrawing;
-import com.company.engine.Direction;
-import com.company.engine.RenderParams;
+import com.company.engine.Light;
 import com.company.exceptions.RenderException;
 import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
@@ -16,6 +15,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -50,12 +50,16 @@ public class GuiController {
     private final List<ModelForDrawing> models = new ArrayList<>();
     private final List<RenderParams> params = new ArrayList<>();
 
-    private Camera camera = new Camera(
+    private final Camera camera = new Camera(
             new Vector3(0, 0, 100),
             new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
 
+    private final Light light = new Light(new Vector3(0, 100, 0));
+
     private Timeline timeline;
+
+    Label fpsViewer = new Label("");
 
     @FXML
     private void initialize() {
@@ -65,7 +69,13 @@ public class GuiController {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
+        anchorPane.getChildren().add(fpsViewer);
+
+        fpsViewer.setAlignment(Pos.CENTER);
+
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+            long lastTime = System.nanoTime();
+
             double width = canvas.getWidth();
             double height = canvas.getHeight();
 
@@ -78,12 +88,17 @@ public class GuiController {
             }
             for (int modelIndex = 0; modelIndex < models.size(); modelIndex++) {
                 try {
-                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, models.get(modelIndex), params.get(modelIndex), (int) width, (int) height, zBuffer);
+                    new RenderEngine(canvas.getGraphicsContext2D(), camera, light, models.get(modelIndex),
+                            params.get(modelIndex), (int) width, (int) height, zBuffer)
+                            .render();
                 } catch (RenderException e) {
                     handle(e);
                 }
             }
+
+            fpsViewer.setText(String.valueOf(1000000000 / (System.nanoTime() - lastTime)));
         });
+
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
@@ -92,7 +107,7 @@ public class GuiController {
     @FXML
     GridPane gridPane;
 
-    private final ArrayList<Button> buttons = new ArrayList<>();
+    private final List<Button> buttons = new ArrayList<>();
 
     @FXML
     private void loadFileOnClick() {
@@ -109,10 +124,12 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
-            ModelForDrawing model = new ModelForDrawing(ObjReader.read(fileContent));
-            model.triangulate();
+            Model base = ObjReader.read(fileContent);
+            base.triangulate();
+            base.reCalcNormals();
+            ModelForDrawing model = new ModelForDrawing(base);
             models.add(model);
-            RenderParams param = new RenderParams(false, true);
+            RenderParams param = new RenderParams(false, true, true);
             params.add(param);
 
             gridPane.getRowConstraints().add(new RowConstraints(100));
@@ -139,7 +156,9 @@ public class GuiController {
             addTexture.setStyle("-fx-background-color: gray;");
             addTexture.setOnMouseClicked(mouseEvent -> {
                 addTextureToModel(model, param);
-                textureButton(param, n);
+                if (model.getTexture() != null) {
+                    textureButton(param, n);
+                }
             });
             gridPane.add(addTexture, 2, n);
 
@@ -163,7 +182,7 @@ public class GuiController {
 
     }
 
-    private void textureButton(RenderParams param, int n){
+    private void textureButton(RenderParams param, int n) {
         Button drawTexture = new Button("NotDrawTexture");
         drawTexture.setFont(new Font(14));
         drawTexture.setMinSize(100,70);
@@ -327,9 +346,14 @@ public class GuiController {
         if (file == null) {
             return;
         }
+
+        Image texture = new Image(file.toString());
+        if (texture == null) {
+            return;
+        }
         try {
             params.drawTexture = true;
-            model.setTexture(new Image(file.toString()));
+            model.setTexture(texture);
             model.triangulate();
         } catch (Exception e) {
             handle(e);

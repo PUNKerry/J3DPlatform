@@ -1,4 +1,4 @@
-package com.company.engine;
+package com.company.gui;
 
 public enum Direction {
     UP,

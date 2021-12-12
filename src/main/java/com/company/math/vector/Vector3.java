@@ -19,7 +19,7 @@ public class Vector3 implements Vector<Vector3> {
 
     public final float dot(Vector3 v1)
     {
-        return (float)(this.x*v1.x + this.y*v1.y + this.z*v1.z);
+        return (this.x*v1.x + this.y*v1.y + this.z*v1.z);
     }
 
     public final void normalize(Vector3 v1)
@@ -69,10 +69,12 @@ public class Vector3 implements Vector<Vector3> {
         return new Vector3(x - v.x, y - v.y, z - v.z);
     }
 
-    public void multiplyingAVectorByAScalar(float k){
-        x *= k;
-        y *= k;
-        z *= k;
+    public Vector2 toVector2(){
+        return new Vector2(x, y);
+    }
+
+    public Vector3 multiplyingAVectorByAScalar(float k){
+        return new Vector3(x * k, y * k, z * k);
     }
 
     public final void sub(Vector3 var1, Vector3 var2) {
@@ -83,10 +85,6 @@ public class Vector3 implements Vector<Vector3> {
 
     public float scalarProduct(Vector3 v){
         return (x * v.x + y * v.y + z * v.z)/length()/v.length();
-    }
-
-    public Vector2 toVector2() {
-        return new Vector2(x, y);
     }
 
     @Override

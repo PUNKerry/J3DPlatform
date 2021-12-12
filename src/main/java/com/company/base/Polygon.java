@@ -1,6 +1,7 @@
 package com.company.base;
 
 import com.company.exceptions.PolygonException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,9 +17,15 @@ public class Polygon {
     }
 
     public void shiftIndexes(int v, int vt, int vn){
-        indicesVertexes = indicesVertexes.stream().map(i -> i += v).collect(Collectors.toList());
-        indicesTextureVertexes = indicesTextureVertexes.stream().map(i -> i += vt).collect(Collectors.toList());
-        indicesNormalVertexes = indicesNormalVertexes.stream().map(i -> i += vn).collect(Collectors.toList());
+        indicesVertexes = indicesVertexes.stream()
+                .map(i -> i += v)
+                .collect(Collectors.toList());
+        indicesTextureVertexes = indicesTextureVertexes.stream()
+                .map(i -> i += vt)
+                .collect(Collectors.toList());
+        indicesNormalVertexes = indicesNormalVertexes.stream()
+                .map(i -> i += vn)
+                .collect(Collectors.toList());
     }
 
     public int getVertexIndex(final int index) {
@@ -110,6 +117,21 @@ public class Polygon {
         } else {
             return List.of(this);
         }
+    }
+
+    public void addReCalcNormal(final int normalIndex) {
+        indicesNormalVertexes.clear();
+        for (int index = 0; index < indicesVertexes.size(); index++) {
+            indicesNormalVertexes.add(normalIndex);
+        }
+    }
+
+    public int getNormalForVertex(final int vertexIndex) {
+        int pos = indicesVertexes.indexOf(vertexIndex);
+        if (pos != -1) {
+            return indicesNormalVertexes.get(pos);
+        }
+        return -1;
     }
 
     @Override

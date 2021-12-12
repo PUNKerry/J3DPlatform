@@ -28,9 +28,8 @@ public class Vector2 implements Vector<Vector2>{
         return new Vector2(x - v.x, y - v.y);
     }
 
-    public void multiplyingAVectorByAScalar(float k){
-        x *= k;
-        y *= k;
+    public Vector2 multiplyingAVectorByAScalar(float k){
+        return new Vector2(x * k, y * k);
     }
 
     public float scalarProduct(Vector2 v){

@@ -109,6 +109,34 @@ public class Model {
         polygons.addAll(allPolygons);
     }
 
+    public void reCalcNormals() {
+        normals.clear();
+        for (Polygon polygon : polygons) {
+            Vector3 v0 = getVertex(polygon.getVertexIndex(0));
+            Vector3 v1 = getVertex(polygon.getVertexIndex(1));
+            Vector3 v2 = getVertex(polygon.getVertexIndex(2));
+            Vector3 dv1 = v1.subtraction(v0);
+            Vector3 dv2 = v2.subtraction(v0);
+            Vector3 vn = dv1.vectorProduct(dv2);
+            vn.normalize();
+            int index = normals.size();
+            polygon.addReCalcNormal(index);
+            normals.add(vn);
+        }
+        normalsInPolygons = true;
+    }
+
+    public List<Vector3> getNormalsOfVertex(final int vertexIndex) {
+        List<Vector3> res = new ArrayList<>();
+        for (Polygon polygon : polygons) {
+            int normalIndex = polygon.getNormalForVertex(vertexIndex);
+            if (normalIndex != -1) {
+                res.add(normals.get(normalIndex));
+            }
+        }
+        return res;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -133,7 +161,7 @@ public class Model {
         return clone;
     }
 
-    public void Shift(Vector3 v){
+    public void shift(Vector3 v){
         vertices = vertices.stream().map(s -> s = s.sum(v)).collect(Collectors.toList());
     }
 
@@ -150,9 +178,9 @@ public class Model {
     }
 
     public void rotation(Matrix3 rotationMatrix, Vector3 shift){
-        Shift(new Vector3(-shift.x, -shift.y, -shift.z));
+        shift(new Vector3(-shift.x, -shift.y, -shift.z));
         vertices = vertices.stream().map(s -> s = rotationMatrix.multiplyingOnVector(s)).collect(Collectors.toList());
-        Shift(shift);
+        shift(shift);
     }
 
     public void addModel(Model model){
@@ -161,5 +189,7 @@ public class Model {
         this.vertices.addAll(model.vertices);
         this.textureVertices.addAll(model.textureVertices);
         this.normals.addAll(model.normals);
+        this.normalsInPolygons = normals.size() != 0;
+        this.texturesInPolygons = textureVertices.size() != 0;
     }
 }

@@ -7,7 +7,7 @@ public interface Vector<V> {
 
      V subtraction(V v);
 
-     void multiplyingAVectorByAScalar(float k);
+     V multiplyingAVectorByAScalar(float k);
 
      float scalarProduct(V v);
 
