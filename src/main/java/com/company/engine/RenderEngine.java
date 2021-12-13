@@ -119,6 +119,10 @@ public class RenderEngine {
                 }
 
                 if (params.drawShadows) {
+                    if (!model.isNormalsInPolygons()) {
+                        throw new RenderException("Can not draw model without normals");
+                    }
+
                     v0 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p0)));
                     v1 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p1)));
                     v2 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p2)));
@@ -223,12 +227,14 @@ public class RenderEngine {
             if (zBuffer[row][col] > z) {
                 zBuffer[row][col] = z;
                 Color color = null;
+                Float alpha = null;
+                Float beta = null;
                 if (params.drawTexture) {
                     Vector2 dp1 = p1.subtraction(p0).toVector2();
                     Vector2 dp2 = p2.subtraction(p0).toVector2();
                     Vector2 dO = o.subtraction(p0.toVector2());
-                    float alpha = calcAlpha(dO, dp1, dp2);
-                    float beta = calcBeta(dO, dp1, dp2);
+                    alpha = calcAlpha(dO, dp1, dp2);
+                    beta = calcBeta(dO, dp1, dp2);
                     Vector2 pointOnTexture = vt0.multiplyingAVectorByAScalar(1 - alpha - beta)
                             .sum(vt1.multiplyingAVectorByAScalar(alpha))
                             .sum(vt2.multiplyingAVectorByAScalar(beta));
@@ -240,11 +246,13 @@ public class RenderEngine {
                     color = params.fillingColor;
                 }
                 if (params.drawShadows) {
-                    Vector2 dp1 = p1.subtraction(p0).toVector2();
-                    Vector2 dp2 = p2.subtraction(p0).toVector2();
-                    Vector2 dO = o.subtraction(p0.toVector2());
-                    float alpha = calcAlpha(dO, dp1, dp2);
-                    float beta = calcBeta(dO, dp1, dp2);
+                    if (alpha == null && beta == null) {
+                        Vector2 dp1 = p1.subtraction(p0).toVector2();
+                        Vector2 dp2 = p2.subtraction(p0).toVector2();
+                        Vector2 dO = o.subtraction(p0.toVector2());
+                        alpha = calcAlpha(dO, dp1, dp2);
+                        beta = calcBeta(dO, dp1, dp2);
+                    }
 
                     Vector2 global = v0.multiplyingAVectorByAScalar(1 - alpha - beta)
                             .sum(v1.multiplyingAVectorByAScalar(alpha))
@@ -259,12 +267,8 @@ public class RenderEngine {
 
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
-                    if (opacity < 0) {
-                        color = Color.BLACK;
-                    } else {
-                        color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                                (int) (color.getBlue() * 255), (1 - 0.6 * opacity));
-                    }
+                    color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+                            (int) (color.getBlue() * 255), (0.5 - 0.3 * opacity));
                 }
                 graphicsContext.getPixelWriter().setColor((int) o.x, (int) o.y, color);
             }
@@ -351,10 +355,20 @@ public class RenderEngine {
                                         final Vector2 v) {
         Vector3 dp1 = p1.subtraction(p0);
         Vector3 dp2 = p2.subtraction(p0);
+        float res = p0.z;
+        /*
         return (-(v.x - p0.x) * Matrix3.determinant2(new float[][] {{dp1.y, dp2.y}, {dp1.z, dp2.z}})
                 + (v.y - p0.y) * Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.z, dp2.z}}))
                 / Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.y, dp2.y}})
                 + p0.z;
+        */
+        float z1 = (-(v.x - p0.x) * Matrix3.determinant2(new float[][] {{dp1.y, dp2.y}, {dp1.z, dp2.z}})
+                + (v.y - p0.y) * Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.z, dp2.z}}));
+        float z2 = Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.y, dp2.y}});
+        if (z2 != 0) {
+            res += z1 / z2;
+        }
+        return res;
     }
 
     private static float calcBeta(final Vector2 dO,
