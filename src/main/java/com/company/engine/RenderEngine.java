@@ -9,8 +9,8 @@ import com.company.math.matrix.Matrix3;
 import com.company.math.matrix.Matrix4;
 import com.company.math.vector.Vector2;
 import com.company.math.vector.Vector3;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,22 +19,39 @@ import static com.company.engine.GraphicConveyor.*;
 
 public class RenderEngine {
 
-    private final GraphicsContext graphicsContext;
-    private final Camera camera;
-    private final Light light;
-    private final ModelForDrawing modelForDrawing;
-    private final RenderParams params;
-    private final int width;
-    private final int height;
-    private final float[][] zBuffer;
+    private PixelWriter pw;
+    private Camera camera;
+    private Light light;
+    private Image texture;
+    private RenderParams params;
+    private int width;
+    private int height;
 
-    private Vector3 v0; //global coordinates
-    private Vector3 v1;
-    private Vector3 v2;
+    public void setPw(PixelWriter pw) {
+        this.pw = pw;
+    }
 
-    private Vector3 p0; //screen
-    private Vector3 p1;
-    private Vector3 p2;
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
+    public void setLight(Light light) {
+        this.light = light;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setzBuffer(float[][] zBuffer) {
+        this.zBuffer = zBuffer;
+    }
+
+    private float[][] zBuffer;
 
     private Vector2 vt0;
     private Vector2 vt1;
@@ -44,22 +61,14 @@ public class RenderEngine {
     private Vector3 vn1;
     private Vector3 vn2;
 
-    public RenderEngine(GraphicsContext graphicsContext, Camera camera, Light light,
-                        ModelForDrawing modelForDrawing, RenderParams params,
-                        int width, int height, float[][] zBuffer) {
-        this.graphicsContext = graphicsContext;
-        this.camera = camera;
-        this.light = light;
-        this.modelForDrawing = modelForDrawing;
-        this.params = params;
-        this.width = width;
-        this.height = height;
-        this.zBuffer = zBuffer;
-    }
+    public RenderEngine() {}
 
-    public void render() throws RenderException {
+    public void render(final ModelForDrawing modelForDrawing,
+                       final RenderParams params)
+            throws RenderException {
         Model model = modelForDrawing.getActualModel();
-        Image texture = modelForDrawing.getTexture();
+        texture = modelForDrawing.getTexture();
+        this.params = params;
         Matrix4 modelMatrix = rotateScaleTranslate();
         Matrix4 viewMatrix = camera.getViewMatrix();
         Matrix4 projectionMatrix = camera.getProjectionMatrix();
@@ -73,16 +82,17 @@ public class RenderEngine {
 
             List<Vector3> resultPoints = new ArrayList<>();
 
-            v0 = model.getVertex(polygon.getVertexIndex(0));
-            v1 = model.getVertex(polygon.getVertexIndex(1));
-            v2 = model.getVertex(polygon.getVertexIndex(2));
+            //global coordinates
+            Vector3 v0 = model.getVertex(polygon.getVertexIndex(0));
+            Vector3 v1 = model.getVertex(polygon.getVertexIndex(1));
+            Vector3 v2 = model.getVertex(polygon.getVertexIndex(2));
 
             resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v0), width, height));
             resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v1), width, height));
             resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v2), width, height));
 
             if (params.drawOnlyMesh) {
-                Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.rgb(0, 0, 0, 1.0);
+                Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
 
                 for (int vertexIndex = 1; vertexIndex < resultPoints.size(); vertexIndex++) {
                     drawLine(color, resultPoints.get(vertexIndex), resultPoints.get(vertexIndex - 1));
@@ -102,9 +112,14 @@ public class RenderEngine {
                     }
                 });
 
-                p0 = resultPoints.get(0);
-                p1 = resultPoints.get(1);
-                p2 = resultPoints.get(2);
+                //screen
+                Vector3 p0 = resultPoints.get(0);
+                Vector3 p1 = resultPoints.get(1);
+                Vector3 p2 = resultPoints.get(2);
+
+                int index0 = copyResult.indexOf(p0);
+                int index1 = copyResult.indexOf(p1);
+                int index2 = copyResult.indexOf(p2);
 
                 if (params.drawTexture) {
                     if (!model.isTexturesInPolygons()) {
@@ -113,9 +128,9 @@ public class RenderEngine {
                     if (texture == null) {
                         throw new RenderException("Can not draw model without texture");
                     }
-                    vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p0)));
-                    vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p1)));
-                    vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(copyResult.indexOf(p2)));
+                    vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(index0));
+                    vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(index1));
+                    vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(index2));
                 }
 
                 if (params.drawShadows) {
@@ -123,12 +138,12 @@ public class RenderEngine {
                         throw new RenderException("Can not draw model without normals");
                     }
 
-                    v0 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p0)));
-                    v1 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p1)));
-                    v2 = model.getVertex(polygon.getVertexIndex(copyResult.indexOf(p2)));
+                    v0 = model.getVertex(polygon.getVertexIndex(index0));
+                    v1 = model.getVertex(polygon.getVertexIndex(index1));
+                    v2 = model.getVertex(polygon.getVertexIndex(index2));
 
 
-                    List<Vector3> normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(copyResult.indexOf(p0)));
+                    List<Vector3> normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index0));
                     Vector3 res = new Vector3(0, 0, 0);
                     for (Vector3 normal : normalsOfPoint) {
                         res = res.subtraction(normal);
@@ -136,7 +151,7 @@ public class RenderEngine {
                     res.normalize();
                     vn0 = res;
 
-                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(copyResult.indexOf(p1)));
+                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index1));
                     res = new Vector3(0, 0, 0);
                     for (Vector3 normal : normalsOfPoint) {
                         res = res.subtraction(normal);
@@ -144,7 +159,7 @@ public class RenderEngine {
                     res.normalize();
                     vn1 = res;
 
-                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(copyResult.indexOf(p2)));
+                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index2));
                     res = new Vector3(0, 0, 0);
                     for (Vector3 normal : normalsOfPoint) {
                         res = res.subtraction(normal);
@@ -168,6 +183,7 @@ public class RenderEngine {
                     Vector3 v3 = null;
                     if (params.drawShadows) {
                         vn3 = vn2.subtraction(vn0).multiplyingAVectorByAScalar(scale).sum(vn0);
+                        vn3.normalize();
                         v3 = v2.subtraction(v0).multiplyingAVectorByAScalar(scale).sum(v0);
                     }
 
@@ -226,7 +242,7 @@ public class RenderEngine {
             float z = calcZOnSurface(p0, p1, p2, o);
             if (zBuffer[row][col] > z) {
                 zBuffer[row][col] = z;
-                Color color = null;
+                Color color;
                 Float alpha = null;
                 Float beta = null;
                 if (params.drawTexture) {
@@ -238,15 +254,15 @@ public class RenderEngine {
                     Vector2 pointOnTexture = vt0.multiplyingAVectorByAScalar(1 - alpha - beta)
                             .sum(vt1.multiplyingAVectorByAScalar(alpha))
                             .sum(vt2.multiplyingAVectorByAScalar(beta));
-                    pointOnTexture.x = pointOnTexture.x * (float) modelForDrawing.getTexture().getWidth();
-                    pointOnTexture.y = (float) modelForDrawing.getTexture().getHeight() * (1 - pointOnTexture.y);
-                    color = modelForDrawing.getTexture().getPixelReader().getColor((int) Math.floor(pointOnTexture.x),
+                    pointOnTexture.x = pointOnTexture.x * (float) texture.getWidth();
+                    pointOnTexture.y = (float) texture.getHeight() * (1 - pointOnTexture.y);
+                    color = texture.getPixelReader().getColor((int) Math.floor(pointOnTexture.x),
                             (int) Math.floor(pointOnTexture.y));
                 } else {
                     color = params.fillingColor;
                 }
                 if (params.drawShadows) {
-                    if (alpha == null && beta == null) {
+                    if (alpha == null) {
                         Vector2 dp1 = p1.subtraction(p0).toVector2();
                         Vector2 dp2 = p2.subtraction(p0).toVector2();
                         Vector2 dO = o.subtraction(p0.toVector2());
@@ -268,22 +284,26 @@ public class RenderEngine {
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
                     color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                            (int) (color.getBlue() * 255), (0.5 - 0.3 * opacity));
+                            (int) (color.getBlue() * 255), (0.7 - 0.3 * opacity));
                 }
-                graphicsContext.getPixelWriter().setColor((int) o.x, (int) o.y, color);
+                pw.setColor((int) o.x, (int) o.y, color);
             }
         }
     }
 
-    private void drawTriangle(Color color,
-                              Vector3 p0, Vector3 p1, Vector3 p2) {
+    private void drawTriangle(final Color color,
+                              final Vector3 p0,
+                              final Vector3 p1,
+                              final Vector3 p2) {
         drawLine(color, p0, p1, p2);
         drawLine(color, p1, p2, p0);
         drawLine(color, p2, p0, p1);
     }
 
-    private void drawLine(Color color,
-                          Vector3 p0, Vector3 p1, Vector3 p2) {
+    private void drawLine(final Color color,
+                          final Vector3 p0,
+                          final Vector3 p1,
+                          final Vector3 p2) {
         Vector2 dir = p1.subtraction(p0).toVector2();
         float k = Math.abs(dir.y / dir.x);
         if (Float.isNaN(k) || k > 1) {
@@ -295,7 +315,7 @@ public class RenderEngine {
                 float z = calcZOnSurface(p0, p1, p2, new Vector2(col, row));
                 if (zBuffer[row][col] >= z) {
                     zBuffer[row][col] = z;
-                    graphicsContext.getPixelWriter().setColor(col, row, color);
+                    pw.setColor(col, row, color);
                 }
             }
         } else {
@@ -307,25 +327,32 @@ public class RenderEngine {
                 float z = calcZOnSurface(p0, p1, p2, new Vector2(col, row));
                 if (zBuffer[row][col] >= z) {
                     zBuffer[row][col] = z;
-                    graphicsContext.getPixelWriter().setColor(col, row, color);
+                    pw.setColor(col, row, color);
                 }
             }
         }
     }
 
-    private void drawLine(Color color,
-                                 Vector3 p0, Vector3 p1) {
+    private void drawLine(final Color color,
+                          final Vector3 p0,
+                          final Vector3 p1) {
         Vector2 dir = p1.subtraction(p0).toVector2();
         float k = Math.abs(dir.y / dir.x);
         if (Float.isNaN(k) || k > 1) {
-            for (int row = (int) Math.floor(Math.min(p0.y, p1.y)); row <= Math.ceil(Math.max(p0.y, p1.y)); row++) {
+            for (int row = (int) Math.ceil(Math.min(p0.y, p1.y)); row <= Math.ceil(Math.max(p0.y, p1.y)); row++) {
                 int col = (int) Math.ceil(calcFormulaX(p0.toVector2(), p1.toVector2(), row));
-                graphicsContext.getPixelWriter().setColor(col, row, color);
+                if (col >= width || row >= height) {
+                    continue;
+                }
+                pw.setColor(col, row, color);
             }
         } else {
-            for (int col = (int) Math.floor(Math.min(p0.x, p1.x)); col <= Math.ceil(Math.max(p0.x, p1.x)); col++) {
+            for (int col = (int) Math.ceil(Math.min(p0.x, p1.x)); col <= Math.ceil(Math.max(p0.x, p1.x)); col++) {
                 int row = (int) Math.ceil(calcFormulaY(p0.toVector2(), p1.toVector2(), col));
-                graphicsContext.getPixelWriter().setColor(col, row, color);
+                if (col >= width || row >= height) {
+                    continue;
+                }
+                pw.setColor(col, row, color);
             }
         }
     }
@@ -356,12 +383,6 @@ public class RenderEngine {
         Vector3 dp1 = p1.subtraction(p0);
         Vector3 dp2 = p2.subtraction(p0);
         float res = p0.z;
-        /*
-        return (-(v.x - p0.x) * Matrix3.determinant2(new float[][] {{dp1.y, dp2.y}, {dp1.z, dp2.z}})
-                + (v.y - p0.y) * Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.z, dp2.z}}))
-                / Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.y, dp2.y}})
-                + p0.z;
-        */
         float z1 = (-(v.x - p0.x) * Matrix3.determinant2(new float[][] {{dp1.y, dp2.y}, {dp1.z, dp2.z}})
                 + (v.y - p0.y) * Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.z, dp2.z}}));
         float z2 = Matrix3.determinant2(new float[][] {{dp1.x, dp2.x}, {dp1.y, dp2.y}});

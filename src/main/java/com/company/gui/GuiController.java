@@ -21,6 +21,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -73,28 +74,47 @@ public class GuiController {
 
         fpsViewer.setAlignment(Pos.CENTER);
 
-        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+        RenderEngine render = new RenderEngine();
+
+        KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
+
             long lastTime = System.nanoTime();
 
-            double width = canvas.getWidth();
-            double height = canvas.getHeight();
+            int width = (int) canvas.getWidth();
+            int height = (int) canvas.getHeight();
+
+            render.setWidth(width);
+            render.setHeight(height);
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-            camera.setAspectRatio((float) (width / height));
+
+            camera.setAspectRatio((float) width / height);
+
+            render.setCamera(camera);
+
             final float[][] zBuffer = new float[(int) height][(int) width];
 
             for (float[] row : zBuffer) {
                 Arrays.fill(row, Float.MAX_VALUE);
             }
+
+            render.setzBuffer(zBuffer);
+
+            WritableImage wi = new WritableImage(width, height);
+
+            render.setPw(wi.getPixelWriter());
+
+            render.setLight(light);
+
             for (int modelIndex = 0; modelIndex < models.size(); modelIndex++) {
                 try {
-                    new RenderEngine(canvas.getGraphicsContext2D(), camera, light, models.get(modelIndex),
-                            params.get(modelIndex), (int) width, (int) height, zBuffer)
-                            .render();
+                    render.render(models.get(modelIndex), params.get(modelIndex));
                 } catch (RenderException e) {
                     handle(e);
                 }
             }
+
+            canvas.getGraphicsContext2D().drawImage(wi, 0, 0);
 
             fpsViewer.setText(String.valueOf(1000000000 / (System.nanoTime() - lastTime)));
         });
