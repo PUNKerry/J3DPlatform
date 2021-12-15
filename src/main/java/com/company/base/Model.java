@@ -65,6 +65,10 @@ public class Model {
         return normals.size();
     }
 
+    public List<Polygon> getPolygons() {
+        return polygons;
+    }
+
     public void addNewPolygon(final Polygon p) throws Exception {
 
         if (p.countOfVertices() < 3) {

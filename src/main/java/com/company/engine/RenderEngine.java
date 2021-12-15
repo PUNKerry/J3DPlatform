@@ -2,7 +2,6 @@ package com.company.engine;
 
 import com.company.base.Model;
 import com.company.base.ModelForDrawing;
-import com.company.base.Polygon;
 import com.company.exceptions.RenderException;
 import com.company.gui.RenderParams;
 import com.company.math.matrix.Matrix3;
@@ -14,6 +13,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.company.engine.GraphicConveyor.*;
 
@@ -26,6 +26,7 @@ public class RenderEngine {
     private RenderParams params;
     private int width;
     private int height;
+    private float[][] zBuffer;
 
     public void setPw(PixelWriter pw) {
         this.pw = pw;
@@ -51,16 +52,6 @@ public class RenderEngine {
         this.zBuffer = zBuffer;
     }
 
-    private float[][] zBuffer;
-
-    private Vector2 vt0;
-    private Vector2 vt1;
-    private Vector2 vt2;
-
-    private Vector3 vn0;
-    private Vector3 vn1;
-    private Vector3 vn2;
-
     public RenderEngine() {}
 
     public void render(final ModelForDrawing modelForDrawing,
@@ -77,130 +68,150 @@ public class RenderEngine {
         modelViewProjectionMatrix.mul(viewMatrix);
         modelViewProjectionMatrix.mul(projectionMatrix);
 
-        for (int polygonInd = 0; polygonInd < model.getCountOfPolygons(); ++polygonInd) {
-            final Polygon polygon = model.getPolygon(polygonInd);
+        model.getPolygons().parallelStream()
+                .forEach(consume(polygon -> {
+                    List<Vector3> resultPoints = new ArrayList<>();
 
-            List<Vector3> resultPoints = new ArrayList<>();
+                    //global coordinates
+                    Vector3 v0 = model.getVertex(polygon.getVertexIndex(0));
+                    Vector3 v1 = model.getVertex(polygon.getVertexIndex(1));
+                    Vector3 v2 = model.getVertex(polygon.getVertexIndex(2));
 
-            //global coordinates
-            Vector3 v0 = model.getVertex(polygon.getVertexIndex(0));
-            Vector3 v1 = model.getVertex(polygon.getVertexIndex(1));
-            Vector3 v2 = model.getVertex(polygon.getVertexIndex(2));
+                    resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v0), width, height));
+                    resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v1), width, height));
+                    resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v2), width, height));
 
-            resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v0), width, height));
-            resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v1), width, height));
-            resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v2), width, height));
+                    if (params.drawOnlyMesh) {
+                        Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
 
-            if (params.drawOnlyMesh) {
-                Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
+                        for (int vertexIndex = 1; vertexIndex < resultPoints.size(); vertexIndex++) {
+                            drawLine(color, resultPoints.get(vertexIndex), resultPoints.get(vertexIndex - 1));
+                        }
 
-                for (int vertexIndex = 1; vertexIndex < resultPoints.size(); vertexIndex++) {
-                    drawLine(color, resultPoints.get(vertexIndex), resultPoints.get(vertexIndex - 1));
-                }
+                        drawLine(color, resultPoints.get(resultPoints.size() - 1), resultPoints.get(0));
 
-                drawLine(color, resultPoints.get(resultPoints.size() - 1), resultPoints.get(0));
-            } else {
-
-                List<Vector3> copyResult = new ArrayList<>(resultPoints);
-
-                resultPoints.sort((p1, p2) -> {
-                    int res = Integer.compare((int) Math.floor(p1.y), (int) Math.floor(p2.y));
-                    if (res != 0) {
-                        return res;
                     } else {
-                        return Float.compare(p1.x, p2.x);
+
+                        List<Vector3> copyResult = new ArrayList<>(resultPoints);
+
+                        resultPoints.sort((p1, p2) -> {
+                            int res = Integer.compare((int) Math.floor(p1.y), (int) Math.floor(p2.y));
+                            if (res != 0) {
+                                return res;
+                            } else {
+                                return Float.compare(p1.x, p2.x);
+                            }
+                        });
+
+                        //screen
+                        Vector3 p0 = resultPoints.get(0);
+                        Vector3 p1 = resultPoints.get(1);
+                        Vector3 p2 = resultPoints.get(2);
+
+                        int index0 = copyResult.indexOf(p0);
+                        int index1 = copyResult.indexOf(p1);
+                        int index2 = copyResult.indexOf(p2);
+
+                        Vector2 vt0 = null;
+                        Vector2 vt1 = null;
+                        Vector2 vt2 = null;
+
+                        if (params.drawTexture) {
+                            if (!model.isTexturesInPolygons()) {
+                                throw new RenderException("Can not draw model without texture coordinates");
+                            }
+                            if (texture == null) {
+                                throw new RenderException("Can not draw model without texture");
+                            }
+                            vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(index0));
+                            vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(index1));
+                            vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(index2));
+                        }
+
+
+                        Vector3 vn0 = null;
+                        Vector3 vn1 = null;
+                        Vector3 vn2 = null;
+
+                        if (params.drawShadows) {
+                            if (!model.isNormalsInPolygons()) {
+                                throw new RenderException("Can not draw model without normals");
+                            }
+
+                            v0 = model.getVertex(polygon.getVertexIndex(index0));
+                            v1 = model.getVertex(polygon.getVertexIndex(index1));
+                            v2 = model.getVertex(polygon.getVertexIndex(index2));
+
+
+                            List<Vector3> normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index0));
+                            Vector3 res = new Vector3(0, 0, 0);
+                            for (Vector3 normal : normalsOfPoint) {
+                                res = res.subtraction(normal);
+                            }
+                            res.normalize();
+                            vn0 = res;
+
+                            normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index1));
+                            res = new Vector3(0, 0, 0);
+                            for (Vector3 normal : normalsOfPoint) {
+                                res = res.subtraction(normal);
+                            }
+                            res.normalize();
+                            vn1 = res;
+
+                            normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index2));
+                            res = new Vector3(0, 0, 0);
+                            for (Vector3 normal : normalsOfPoint) {
+                                res = res.subtraction(normal);
+                            }
+                            res.normalize();
+                            vn2 = res;
+                        }
+
+                        if (Math.floor(p0.y) == Math.floor(p1.y)) {
+                            drawDownDirected(p2, p0, p1, vt2, vt0, vt1, vn2, vn0, vn1, v2, v0, v1);
+                        } else if (Math.floor(p1.y) == Math.floor(p2.y)) {
+                            drawUpDirected(p0, p1, p2, vt0, vt1, vt2, vn0, vn1, vn2, v0, v1, v2);
+                        } else {
+                            Vector3 p3 = new Vector3(calcFormulaX(p0.toVector2(), p2.toVector2(), p1.y), p1.y, calcFormulaZ(p0, p2, p1.y));
+                            float scale = p3.subtraction(p0).length() / p2.subtraction(p0).length();
+                            Vector2 vt3 = null;
+                            if (params.drawTexture) {
+                                vt3 = vt2.subtraction(vt0).multiplyingAVectorByAScalar(scale).sum(vt0);
+                            }
+                            Vector3 vn3 = null;
+                            Vector3 v3 = null;
+                            if (params.drawShadows) {
+                                vn3 = vn2.subtraction(vn0).multiplyingAVectorByAScalar(scale).sum(vn0);
+                                vn3.normalize();
+                                v3 = v2.subtraction(v0).multiplyingAVectorByAScalar(scale).sum(v0);
+                            }
+
+                            if (p1.x < p3.x) {
+                                drawUpDirected(p0, p1, p3, vt0, vt1, vt3, vn0, vn1, vn3, v0, v1, v3);
+                                drawDownDirected(p2, p1, p3, vt2, vt1, vt3, vn2, vn1, vn3, v2, v1, v3);
+                            } else {
+                                drawUpDirected(p0, p3, p1, vt0, vt3, vt1, vn0, vn3, vn1, v0, v3, v1);
+                                drawDownDirected(p2, p3, p1, vt2, vt3, vt1, vn2, vn3, vn1, v2, v3, v1);
+                            }
+                        }
+                        if (params.drawMesh) {
+                            Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
+                            drawTriangle(color, p0, p1, p2);
+                        }
                     }
-                });
+                })
+        );
+    }
 
-                //screen
-                Vector3 p0 = resultPoints.get(0);
-                Vector3 p1 = resultPoints.get(1);
-                Vector3 p2 = resultPoints.get(2);
-
-                int index0 = copyResult.indexOf(p0);
-                int index1 = copyResult.indexOf(p1);
-                int index2 = copyResult.indexOf(p2);
-
-                if (params.drawTexture) {
-                    if (!model.isTexturesInPolygons()) {
-                        throw new RenderException("Can not draw model without texture coordinates");
-                    }
-                    if (texture == null) {
-                        throw new RenderException("Can not draw model without texture");
-                    }
-                    vt0 = model.getTextureVertex(polygon.getTextureVertexIndex(index0));
-                    vt1 = model.getTextureVertex(polygon.getTextureVertexIndex(index1));
-                    vt2 = model.getTextureVertex(polygon.getTextureVertexIndex(index2));
-                }
-
-                if (params.drawShadows) {
-                    if (!model.isNormalsInPolygons()) {
-                        throw new RenderException("Can not draw model without normals");
-                    }
-
-                    v0 = model.getVertex(polygon.getVertexIndex(index0));
-                    v1 = model.getVertex(polygon.getVertexIndex(index1));
-                    v2 = model.getVertex(polygon.getVertexIndex(index2));
-
-
-                    List<Vector3> normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index0));
-                    Vector3 res = new Vector3(0, 0, 0);
-                    for (Vector3 normal : normalsOfPoint) {
-                        res = res.subtraction(normal);
-                    }
-                    res.normalize();
-                    vn0 = res;
-
-                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index1));
-                    res = new Vector3(0, 0, 0);
-                    for (Vector3 normal : normalsOfPoint) {
-                        res = res.subtraction(normal);
-                    }
-                    res.normalize();
-                    vn1 = res;
-
-                    normalsOfPoint = model.getNormalsOfVertex(polygon.getVertexIndex(index2));
-                    res = new Vector3(0, 0, 0);
-                    for (Vector3 normal : normalsOfPoint) {
-                        res = res.subtraction(normal);
-                    }
-                    res.normalize();
-                    vn2 = res;
-                }
-
-                if (Math.floor(p0.y) == Math.floor(p1.y)) {
-                    drawDownDirected(p2, p0, p1, vt2, vt0, vt1, vn2, vn0, vn1, v2, v0, v1);
-                } else if (Math.floor(p1.y) == Math.floor(p2.y)) {
-                    drawUpDirected(p0, p1, p2, vt0, vt1, vt2, vn0, vn1, vn2, v0, v1, v2);
-                } else {
-                    Vector3 p3 = new Vector3(calcFormulaX(p0.toVector2(), p2.toVector2(), p1.y), p1.y, calcFormulaZ(p0, p2, p1.y));
-                    float scale = p3.subtraction(p0).length() / p2.subtraction(p0).length();
-                    Vector2 vt3 = null;
-                    if (params.drawTexture) {
-                        vt3 = vt2.subtraction(vt0).multiplyingAVectorByAScalar(scale).sum(vt0);
-                    }
-                    Vector3 vn3 = null;
-                    Vector3 v3 = null;
-                    if (params.drawShadows) {
-                        vn3 = vn2.subtraction(vn0).multiplyingAVectorByAScalar(scale).sum(vn0);
-                        vn3.normalize();
-                        v3 = v2.subtraction(v0).multiplyingAVectorByAScalar(scale).sum(v0);
-                    }
-
-                    if (p1.x < p3.x) {
-                        drawUpDirected(p0, p1, p3, vt0, vt1, vt3, vn0, vn1, vn3, v0, v1, v3);
-                        drawDownDirected(p2, p1, p3, vt2, vt1, vt3, vn2, vn1, vn3, v2, v1, v3);
-                    } else {
-                        drawUpDirected(p0, p3, p1, vt0, vt3, vt1, vn0, vn3, vn1, v0, v3, v1);
-                        drawDownDirected(p2, p3, p1, vt2, vt3, vt1, vn2, vn3, vn1, v2, v3, v1);
-                    }
-                }
-                if (params.drawMesh) {
-                    Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
-                    drawTriangle(color, p0, p1, p2);
-                }
+    private <T, E extends Exception> Consumer<T> consume(ConsumerWithException<T, E> ce) {
+        return arg -> {
+            try {
+                ce.accept(arg);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        }
+        };
     }
 
     private void drawUpDirected(Vector3 p0, Vector3 p1, Vector3 p2,
@@ -284,7 +295,7 @@ public class RenderEngine {
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
                     color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                            (int) (color.getBlue() * 255), (0.7 - 0.3 * opacity));
+                            (int) (color.getBlue() * 255), (0.7 - 0.25 * opacity));
                 }
                 pw.setColor((int) o.x, (int) o.y, color);
             }
