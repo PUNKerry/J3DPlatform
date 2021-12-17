@@ -17,9 +17,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
@@ -60,17 +58,58 @@ public class GuiController {
 
     private Timeline timeline;
 
+    @FXML
     Label fpsViewer = new Label("");
+
+    @FXML
+    TextField cameraTargetX;
+
+    @FXML
+    TextField cameraTargetY;
+
+    @FXML
+    TextField cameraTargetZ;
+
+    @FXML
+    private void targetApply(){
+        camera.setTarget(new Vector3(Float.valueOf(cameraTargetX.getText()), Float.valueOf(cameraTargetY.getText()), Float.valueOf(cameraTargetZ.getText())));
+    }
+
+    @FXML
+    TextField cameraPositionX;
+
+    @FXML
+    TextField cameraPositionY;
+
+    @FXML
+    TextField cameraPositionZ;
+
+    @FXML
+    private void positionApply(){
+        light.setPosition(new Vector3(Float.valueOf(cameraPositionX.getText()), Float.valueOf(cameraPositionY.getText()), Float.valueOf(cameraPositionZ.getText())));
+    }
+
+    @FXML
+    TextField lightX;
+
+    @FXML
+    TextField lightY;
+
+    @FXML
+    TextField lightZ;
+
+    @FXML
+    private void setLight(){
+        camera.setPosition(new Vector3(Float.valueOf(lightX.getText()), Float.valueOf(lightY.getText()), Float.valueOf(lightZ.getText())));
+    }
 
     @FXML
     private void initialize() {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
-
+        anchorPane.getStylesheets().add("stile.css");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
-
-        anchorPane.getChildren().add(fpsViewer);
 
         fpsViewer.setAlignment(Pos.CENTER);
 
@@ -105,6 +144,7 @@ public class GuiController {
             render.setPw(wi.getPixelWriter());
 
             render.setLight(light);
+           // updateParams();
 
             for (int modelIndex = 0; modelIndex < models.size(); modelIndex++) {
                 try {
@@ -119,15 +159,57 @@ public class GuiController {
             fpsViewer.setText(String.valueOf(1000000000 / (System.nanoTime() - lastTime)));
         });
 
+        cameraPositionX.setText(String.valueOf(camera.getPosition().x));
+        cameraPositionY.setText(String.valueOf(camera.getPosition().y));
+        cameraPositionZ.setText(String.valueOf(camera.getPosition().z));
+
+        cameraTargetX.setText(String.valueOf(camera.getTarget().x));
+        cameraTargetY.setText(String.valueOf(camera.getTarget().y));
+        cameraTargetZ.setText(String.valueOf(camera.getTarget().z));
+
+        lightX.setText(String.valueOf(light.getPosition().x));
+        lightY.setText(String.valueOf(light.getPosition().y));
+        lightZ.setText(String.valueOf(light.getPosition().z));
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
 
     @FXML
-    GridPane gridPane;
+    GridPane gridPaneModels;
 
-    private final List<Button> buttons = new ArrayList<>();
+    @FXML
+    public void showMenu(){
+        gridPaneModels.setVisible(!gridPaneModels.isVisible());
+        aboutModel.setVisible(!aboutModel.isVisible());
+    }
+
+    @FXML
+    GridPane aboutModel;
+
+    @FXML
+    Label shift;
+
+    @FXML
+    Label stretch;
+
+    @FXML
+    Label rotation;
+
+    private ModelForDrawing chosenModel;
+
+    private double round(float value){
+        double scale = Math.pow(10, 2);
+        return Math.ceil(value * scale) / scale;
+    }
+
+    private void setChosenModel(ModelForDrawing model) {
+        chosenModel = model;
+
+        shift.setText("Model shifts: x:" + model.getShift().x + " y:" + model.getShift().y + " z:" + model.getShift().z);
+        stretch.setText("Mpdel stretch: x:" + round(model.getXStretching()) + " y:" + round(model.getYStretching()) + " z:" + round(model.getZStretching()));
+        rotation.setText("Model rotation: x:" + round(model.getxRotation()) + " y:" + round(model.getyRotation()) + " z:" + round(model.getzRotation()));
+    }
 
     @FXML
     private void loadFileOnClick() {
@@ -143,8 +225,7 @@ public class GuiController {
         Path fileName = Path.of(file.getAbsolutePath());
 
         try {
-            String fileContent = Files.readString(fileName);
-            Model base = ObjReader.read(fileContent);
+            Model base = ObjReader.readFromFile(fileName);
             base.triangulate();
             base.reCalcNormals();
             ModelForDrawing model = new ModelForDrawing(base);
@@ -152,78 +233,116 @@ public class GuiController {
             RenderParams param = new RenderParams(false, true, true);
             params.add(param);
 
-            gridPane.getRowConstraints().add(new RowConstraints(100));
+            gridPaneModels.getRowConstraints().add(new RowConstraints(100));
 
             int n = models.size();
 
-            Button button = new Button("Active");
-            button.setFont(new Font(15));
-            button.setMinSize(100,70);
-            button.setStyle("-fx-background-color: gray;");
-            button.setOnMouseClicked(mouseEvent -> activateModel(n, model));
-            buttons.add(button);
-            gridPane.add(button, 1, n);
+            CheckBox active = new CheckBox();
+            active.setOnMouseClicked(mouseEvent ->  model.setChangingNow(!model.isChangingNow()));
+            gridPaneModels.add(active, 1, n);
 
-            Label label = new Label(" Model " + String.valueOf(n));
-            label.setMinSize(80,70);
-            label.setFont(new Font(15));
-            label.setStyle("-fx-background-color: gray;");
-            gridPane.add(label, 0, n);
+            CheckBox light = new CheckBox();
+            light.setOnMouseClicked(mouseEvent ->  param.drawShadows = !param.drawShadows);
+            gridPaneModels.add(light, 4, n);
 
-            Button addTexture = new Button("addTexture");
-            addTexture.setFont(new Font(15));
-            addTexture.setMinSize(100,70);
-            addTexture.setStyle("-fx-background-color: gray;");
+            Button delite = new Button("Delite");
+            delite.setOnMouseClicked(mouseEvent -> {
+                models.remove(n - 1);
+                params.remove(n - 1);
+//                for (int i = 0; i < 7; i++) {
+//                    gridPaneModels.getChildren().remove(i, n);
+//                }
+            });
+            gridPaneModels.add(delite, 3, n);
+
+            Button chouseModel = new Button(model.getActualModel().getName());
+            chouseModel.setOnMouseClicked(mouseEvent -> {
+                setChosenModel(model);
+            });
+            gridPaneModels.add(chouseModel, 0, n);
+
+//            CheckBox drawTexture = new CheckBox();
+//            drawTexturs.add(drawTexture);
+
+            Button addTexture = new Button("Add texture");
             addTexture.setOnMouseClicked(mouseEvent -> {
                 addTextureToModel(model, param);
                 if (model.getTexture() != null) {
                     textureButton(param, n);
                 }
             });
-            gridPane.add(addTexture, 2, n);
+            gridPaneModels.add(addTexture, 5, n);
 
-            Button drawMesh = new Button("DrawMesh");
-            drawMesh.setFont(new Font(15));
-            drawMesh.setMinSize(115,70);
-            drawMesh.setStyle("-fx-background-color: gray;");
+            Button drawMesh = new Button("Draw Mesh");
             drawMesh.setOnMouseClicked(mouseEvent -> {
-                param.drawMesh = !param.drawMesh;
-                if (param.drawMesh) {
-                    drawMesh.setText("DrawMesh");
+                if (param.drawOnlyMesh) {
+                    param.drawOnlyMesh = false;
+                    param.drawMesh = true;
+                    drawMesh.setText("Draw Mesh");
                 }
                 else {
-                    drawMesh.setText("NotDrawMesh");
+                    if(param.drawMesh) {
+                        drawMesh.setText("Not draw mesh");
+                        param.drawOnlyMesh = false;
+                        param.drawMesh = false;
+                    }
+                    else {
+                        drawMesh.setText("Draw only mesh");
+                        param.drawOnlyMesh = true;
+                    }
                 }
             });
-            gridPane.add(drawMesh, 3, n);
+            gridPaneModels.add(drawMesh, 2, n);
+
+//            gridPaneModels.add(drawTexture, 3, n);
+
         } catch (Exception e) {
             handle(e);
         }
+    }
+
+//    private List<CheckBox>  drawTexturs = new ArrayList<>();
+//
+//    private void updateParams(){
+//        for (int i = 0; i < drawTexturs.size(); i++) {
+//            params.get(i).drawTexture = drawTexturs.get(i).isSelected();
+//        }
+//    }
+
+    private void textureButton(RenderParams param, int n) {
+        CheckBox drawTexture = new CheckBox();
+        drawTexture.setOnMouseClicked(mouseEvent -> {
+            param.drawTexture = !param.drawTexture;
+        });
+        gridPaneModels.add(drawTexture, 6, n);
+    }
+
+    @FXML
+    private void removeShift() {
+        Vector3 shif = chosenModel.getShift();
+        chosenModel.move(new Vector3(-shif.x, -shif.y, -shif.z));
 
     }
 
-    private void textureButton(RenderParams param, int n) {
-        Button drawTexture = new Button("NotDrawTexture");
-        drawTexture.setFont(new Font(14));
-        drawTexture.setMinSize(100,70);
-        drawTexture.setStyle("-fx-background-color: gray;");
-        drawTexture.setOnMouseClicked(mouseEvent -> {
-            param.drawTexture = !param.drawTexture;
-            if (param.drawTexture) {
-                drawTexture.setText("DrawTexture");
-            }
-            else {
-                drawTexture.setText("NotDrawTexture");
-            }
-        });
-        gridPane.add(drawTexture, 4, n);
+    @FXML
+    private void removeStretch() {
+        chosenModel.XStretching(1);
+        chosenModel.YStretching(1);
+        chosenModel.ZStretching(1);
+    }
+
+    @FXML
+    private void removeRotation() {
+        chosenModel.rotationX(-chosenModel.getxRotation());
+        chosenModel.rotationY(-chosenModel.getyRotation());
+        chosenModel.rotationZ(-chosenModel.getzRotation());
     }
 
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
     private static final float A = 0.02f;
-    private static final float COS_A = (float) Math.cos(A);
-    private static final float SIN_A = (float) Math.sin(A);
+
+
 
     @FXML
     private void stretchX() {
@@ -311,49 +430,43 @@ public class GuiController {
 
     @FXML
     private void rotateX() {
-        float[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationX(A);
         });
     }
 
     @FXML
     private void rotateY() {
-        float[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationY(A);
         });
     }
 
     @FXML
     private void rotateZ() {
-        float[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationZ(A);
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionX() {
-        float[][] m = {{1, 0, 0},{0, COS_A, -SIN_A},{0, SIN_A, COS_A}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationX(-A);
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionY() {
-        float[][] m = {{COS_A, 0, -SIN_A},{0, 1, 0},{SIN_A, 0, COS_A}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationY(-A);
         });
     }
 
     @FXML
     private void rotateInTheOppositeDirectionZ() {
-        float[][] m = {{COS_A, -SIN_A, 0},{SIN_A, COS_A, 0},{0, 0, 1}};
         models.forEach(modelForDrawing -> {
-            if(modelForDrawing.isChangingNow()) modelForDrawing.rotation(new Matrix3(m));
+            if(modelForDrawing.isChangingNow()) modelForDrawing.rotationZ(-A);
         });
     }
 
@@ -516,13 +629,5 @@ public class GuiController {
                 handle(e);
             }
         });
-    }
-
-    public void activateModel(int n, ModelForDrawing model){
-
-            model.setChangingNow(!model.isChangingNow());
-            if(model.isChangingNow()) buttons.get(n - 1).setText("Active");
-            else buttons.get(n - 1).setText("Not active");
-
     }
 }

@@ -7,7 +7,8 @@ public class RenderParams {
     public boolean drawMesh;
     public boolean drawShadows;
     public boolean drawOnlyMesh = false;
-    public Color fillingColor = Color.rgb(102, 102, 102, 1.0);
+    public Color fillingColor = Color.rgb(52, 52, 52, 1.0);
+    public Color meshColor = Color.BLACK;
 
     public RenderParams(boolean drawTexture, boolean drawMesh, boolean drawShadows) {
         this.drawTexture = drawTexture;

@@ -20,6 +20,22 @@ public class Model {
 
     private boolean texturesInPolygons = false;
     private boolean normalsInPolygons = false;
+    private String name;
+
+    public Model() {
+    }
+
+    public Model(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public void addNewVertex(final Vector3 v) {
         vertices.add(v);
@@ -162,6 +178,7 @@ public class Model {
         clone.polygons = new ArrayList<>(this.polygons);
         clone.normalsInPolygons = normalsInPolygons;
         clone.texturesInPolygons = texturesInPolygons;
+        clone.name = name;
         return clone;
     }
 
@@ -185,6 +202,7 @@ public class Model {
         shift(new Vector3(-shift.x, -shift.y, -shift.z));
         vertices = vertices.stream().map(s -> s = rotationMatrix.multiplyingOnVector(s)).collect(Collectors.toList());
         shift(shift);
+        reCalcNormals();
     }
 
     public void addModel(Model model){

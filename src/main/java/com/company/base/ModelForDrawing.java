@@ -10,6 +10,9 @@ public class ModelForDrawing {
     private float xStretching = 1;
     private float yStretching = 1;
     private float zStretching = 1;
+    private float xRotation = 0;
+    private float yRotation = 0;
+    private float zRotation = 0;
     private Vector3 shift = new Vector3(0, 0, 0);
     private boolean isChangingNow = true;
     private Image texture = null;
@@ -42,9 +45,31 @@ public class ModelForDrawing {
         zStretching = n;
     }
 
-    public void rotation(Matrix3 rotationMatrix){
+    public void rotationX(float A){
+        xRotation += A;
+        float COS_A = (float) Math.cos(A);
+        float SIN_A = (float) Math.sin(A);
+        float[][] m = {{1, 0, 0},{0, COS_A, SIN_A},{0, -SIN_A, COS_A}};
         if(changingModel == null) changingModel = initialModel.clone();
-        changingModel.rotation(rotationMatrix, shift);
+        changingModel.rotation(new Matrix3(m), shift);
+    }
+
+    public void rotationY(float A){
+        yRotation += A;
+        float COS_A = (float) Math.cos(A);
+        float SIN_A = (float) Math.sin(A);
+        float[][] m = {{COS_A, 0, SIN_A},{0, 1, 0},{-SIN_A, 0, COS_A}};
+        if(changingModel == null) changingModel = initialModel.clone();
+        changingModel.rotation(new Matrix3(m), shift);
+    }
+
+    public void rotationZ(float A){
+        zRotation += A;
+        float COS_A = (float) Math.cos(A);
+        float SIN_A = (float) Math.sin(A);
+        float[][] m = {{COS_A, SIN_A, 0},{-SIN_A, COS_A, 0},{0, 0, 1}};
+        if(changingModel == null) changingModel = initialModel.clone();
+        changingModel.rotation(new Matrix3(m), shift);
     }
 
     public Model getChangingModel() {
@@ -58,6 +83,30 @@ public class ModelForDrawing {
     public Model getActualModel(){
         if(changingModel != null) return changingModel;
         return initialModel;
+    }
+
+    public float getxRotation() {
+        return xRotation;
+    }
+
+    public float getxStretching() {
+        return xStretching;
+    }
+
+    public float getyRotation() {
+        return yRotation;
+    }
+
+    public float getyStretching() {
+        return yStretching;
+    }
+
+    public float getzRotation() {
+        return zRotation;
+    }
+
+    public float getzStretching() {
+        return zStretching;
     }
 
     public Vector3 getShift() {

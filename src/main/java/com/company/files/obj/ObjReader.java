@@ -19,7 +19,9 @@ public class ObjReader {
 
     public static Model readFromFile(Path fileName) throws Exception {
         String fileContent = Files.readString(fileName);
-        return read(fileContent);
+        Model m = read(fileContent);
+        m.setName(fileName.getFileName().toString());
+        return m;
     }
 
     public static Model read(String fileContent) throws Exception {

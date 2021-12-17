@@ -82,7 +82,7 @@ public class RenderEngine {
                     resultPoints.add(vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, v2), width, height));
 
                     if (params.drawOnlyMesh) {
-                        Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
+                        Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : params.meshColor;
 
                         for (int vertexIndex = 1; vertexIndex < resultPoints.size(); vertexIndex++) {
                             drawLine(color, resultPoints.get(vertexIndex), resultPoints.get(vertexIndex - 1));
@@ -196,7 +196,7 @@ public class RenderEngine {
                             }
                         }
                         if (params.drawMesh) {
-                            Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : Color.BLACK;
+                            Color color = modelForDrawing.isChangingNow() ? Color.rgb(0, 30, 100, 1.0) : params.meshColor;
                             drawTriangle(color, p0, p1, p2);
                         }
                     }
@@ -295,7 +295,7 @@ public class RenderEngine {
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
                     color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                            (int) (color.getBlue() * 255), (0.7 - 0.25 * opacity));
+                            (int) (color.getBlue() * 255), (0.5 - 0.45 * opacity));
                 }
                 pw.setColor((int) o.x, (int) o.y, color);
             }
