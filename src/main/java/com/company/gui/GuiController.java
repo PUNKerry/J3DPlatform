@@ -23,6 +23,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -42,6 +43,28 @@ public class GuiController {
 
     @FXML
     AnchorPane anchorPane;
+
+    @FXML
+    MenuBar menuBar;
+
+    @FXML
+    Menu menu;
+
+    private boolean isDarkTheme = false;
+
+    @FXML
+    public void changeTheme(){
+        if(isDarkTheme){
+            anchorPane.setStyle("-fx-background-color: gray");
+            menuBar.setStyle("-fx-background-color: gray");
+            params.forEach(p -> p.meshColor = Color.rgb(40,40,40));
+        }else {
+            anchorPane.setStyle("-fx-background-color: rgb(40,40,40)");
+            menuBar.setStyle("-fx-background-color: rgb(40,40,40)");
+            params.forEach(p -> p.meshColor = Color.GRAY);
+        }
+        isDarkTheme = !isDarkTheme;
+    }
 
     @FXML
     private Canvas canvas;
@@ -86,7 +109,7 @@ public class GuiController {
 
     @FXML
     private void positionApply(){
-        light.setPosition(new Vector3(Float.valueOf(cameraPositionX.getText()), Float.valueOf(cameraPositionY.getText()), Float.valueOf(cameraPositionZ.getText())));
+        camera.setPosition(new Vector3(Float.valueOf(cameraPositionX.getText()), Float.valueOf(cameraPositionY.getText()), Float.valueOf(cameraPositionZ.getText())));
     }
 
     @FXML
@@ -100,11 +123,12 @@ public class GuiController {
 
     @FXML
     private void setLight(){
-        camera.setPosition(new Vector3(Float.valueOf(lightX.getText()), Float.valueOf(lightY.getText()), Float.valueOf(lightZ.getText())));
+        light.setPosition(new Vector3(Float.valueOf(lightX.getText()), Float.valueOf(lightY.getText()), Float.valueOf(lightZ.getText())));
     }
 
     @FXML
     private void initialize() {
+        anchorPane.setStyle("-fx-background-color: gray");
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         anchorPane.getStylesheets().add("stile.css");
@@ -261,9 +285,6 @@ public class GuiController {
             });
             gridPaneModels.add(chouseModel, 0, n);
 
-//            CheckBox drawTexture = new CheckBox();
-//            drawTexturs.add(drawTexture);
-
             Button addTexture = new Button("Add texture");
             addTexture.setOnMouseClicked(mouseEvent -> {
                 addTextureToModel(model, param);
@@ -293,21 +314,10 @@ public class GuiController {
                 }
             });
             gridPaneModels.add(drawMesh, 2, n);
-
-//            gridPaneModels.add(drawTexture, 3, n);
-
         } catch (Exception e) {
             handle(e);
         }
     }
-
-//    private List<CheckBox>  drawTexturs = new ArrayList<>();
-//
-//    private void updateParams(){
-//        for (int i = 0; i < drawTexturs.size(); i++) {
-//            params.get(i).drawTexture = drawTexturs.get(i).isSelected();
-//        }
-//    }
 
     private void textureButton(RenderParams param, int n) {
         CheckBox drawTexture = new CheckBox();
@@ -341,8 +351,6 @@ public class GuiController {
     private static final float STRETCH = 0.01f;
     private static final float MOVE = 2;
     private static final float A = 0.02f;
-
-
 
     @FXML
     private void stretchX() {
