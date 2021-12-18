@@ -52,8 +52,8 @@ public class GuiController {
     @FXML
     public void changeTheme(){
         if(isDarkTheme){
-            anchorPane.setStyle("-fx-background-color: gray");
-            menuBar.setStyle("-fx-background-color: gray");
+            anchorPane.setStyle("-fx-background-color: white");
+            menuBar.setStyle("-fx-background-color: white");
             params.forEach(p -> p.meshColor = Color.rgb(40,40,40));
         }else {
             anchorPane.setStyle("-fx-background-color: rgb(40,40,40)");
@@ -141,7 +141,7 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-        anchorPane.setStyle("-fx-background-color: gray");
+        anchorPane.setStyle("-fx-background-color: white");
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         anchorPane.getStylesheets().add("style.css");
@@ -244,7 +244,7 @@ public class GuiController {
         chosenModel = model;
 
         shift.setText("Model shifts: x:" + model.getShift().x + " y:" + model.getShift().y + " z:" + model.getShift().z);
-        stretch.setText("Mpdel stretch: x:" + round(model.getXStretching()) + " y:" + round(model.getYStretching()) + " z:" + round(model.getZStretching()));
+        stretch.setText("Model stretch: x:" + round(model.getXStretching()) + " y:" + round(model.getYStretching()) + " z:" + round(model.getZStretching()));
         rotation.setText("Model rotation: x:" + round(model.getxRotation()) + " y:" + round(model.getyRotation()) + " z:" + round(model.getzRotation()));
     }
 
@@ -334,6 +334,7 @@ public class GuiController {
 
     private void textureButton(RenderParams param, int n) {
         CheckBox drawTexture = new CheckBox();
+        drawTexture.setSelected(true);
         drawTexture.setOnMouseClicked(mouseEvent -> {
             param.drawTexture = !param.drawTexture;
         });

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.gui.GuiController">
-    <MenuBar fx:id="menuBar" prefHeight="25.0" prefWidth="1164.0" style="-fx-background-color: gray;" styleClass="-fx-background-color: gray">
+    <MenuBar fx:id="menuBar" prefHeight="25.0" prefWidth="1164.0" style="-fx-background-color: white;" styleClass="-fx-background-color: white">
         <Menu fx:id="menu1" mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#loadFileOnClick" text="Open Model">
             <accelerator>
@@ -250,6 +250,7 @@
          <TextField fx:id="cameraPositionX" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          <TextField fx:id="cameraPositionY" GridPane.columnIndex="2" GridPane.rowIndex="3" />
          <TextField fx:id="cameraPositionZ" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+          <Button mnemonicParsing="false" text="Apply" onAction="#setLight" GridPane.columnIndex="4" GridPane.rowIndex="5" />
          <Button fx:id="cameraPositionApply" mnemonicParsing="false" onAction="#positionApply" text="Apply" GridPane.columnIndex="4" GridPane.rowIndex="3" />
       </children>
    </GridPane>
