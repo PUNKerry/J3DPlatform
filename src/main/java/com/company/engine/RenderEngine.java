@@ -295,7 +295,7 @@ public class RenderEngine {
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
                     color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                            (int) (color.getBlue() * 255), (0.5 - 0.45 * opacity));
+                            (int) (color.getBlue() * 255), calcOpacity(opacity, params.lightScale)); // 0.5 - 0.3 * opacity
                 }
                 pw.setColor((int) o.x, (int) o.y, color);
             }
@@ -413,5 +413,18 @@ public class RenderEngine {
                                    final Vector2 dp1,
                                    final Vector2 dp2) {
         return (dp2.x * dO.y - dp2.y * dO.x) / (dp1.y * dp2.x - dp2.y * dp1.x);
+    }
+
+    private static float calcOpacity(final float scalarProduct,
+                                     final float center) {
+        if (center < 0 || center > 1) {
+            return -1;
+        }
+        float val = scalarProduct * 0.7F;
+        if (val >= 0) {
+            return center * (1 - val);
+        } else {
+            return center - (1 - center) * val;
+        }
     }
 }

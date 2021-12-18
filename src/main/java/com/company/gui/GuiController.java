@@ -8,7 +8,6 @@ import com.company.files.obj.ObjReader;
 import com.company.engine.Camera;
 import com.company.engine.RenderEngine;
 import com.company.files.obj.ObjWriter;
-import com.company.math.matrix.Matrix3;
 import com.company.math.vector.Vector3;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
@@ -24,10 +23,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.File;
 import java.util.ArrayList;
@@ -131,7 +128,7 @@ public class GuiController {
         anchorPane.setStyle("-fx-background-color: gray");
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
-        anchorPane.getStylesheets().add("stile.css");
+        anchorPane.getStylesheets().add("style.css");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
@@ -254,7 +251,7 @@ public class GuiController {
             base.reCalcNormals();
             ModelForDrawing model = new ModelForDrawing(base);
             models.add(model);
-            RenderParams param = new RenderParams(false, true, true);
+            RenderParams param = new RenderParams(false, true, false);
             params.add(param);
 
             gridPaneModels.getRowConstraints().add(new RowConstraints(100));
@@ -269,21 +266,21 @@ public class GuiController {
             light.setOnMouseClicked(mouseEvent ->  param.drawShadows = !param.drawShadows);
             gridPaneModels.add(light, 4, n);
 
-            Button delite = new Button("Delite");
-            delite.setOnMouseClicked(mouseEvent -> {
+            Button delete = new Button("Delete");
+            delete.setOnMouseClicked(mouseEvent -> {
                 models.remove(n - 1);
                 params.remove(n - 1);
 //                for (int i = 0; i < 7; i++) {
 //                    gridPaneModels.getChildren().remove(i, n);
 //                }
             });
-            gridPaneModels.add(delite, 3, n);
+            gridPaneModels.add(delete, 3, n);
 
-            Button chouseModel = new Button(model.getActualModel().getName());
-            chouseModel.setOnMouseClicked(mouseEvent -> {
+            Button chooseModel = new Button(model.getActualModel().getName());
+            chooseModel.setOnMouseClicked(mouseEvent -> {
                 setChosenModel(model);
             });
-            gridPaneModels.add(chouseModel, 0, n);
+            gridPaneModels.add(chooseModel, 0, n);
 
             Button addTexture = new Button("Add texture");
             addTexture.setOnMouseClicked(mouseEvent -> {
