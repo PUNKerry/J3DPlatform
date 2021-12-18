@@ -6,6 +6,18 @@ public class Light {
 
     private Vector3 position;
 
+    private float lightScale = 0.5F;
+
+    public float getLightScale() {
+        return lightScale;
+    }
+
+    public void setLightScale(float lightScale) {
+        if(lightScale >= 0 && lightScale <= 1) {
+            this.lightScale = lightScale;
+        }
+    }
+
     public Light(Vector3 position) {
         this.position = position;
     }

@@ -124,6 +124,22 @@ public class GuiController {
     }
 
     @FXML
+    TextField lightPower;
+
+    @FXML
+    private void addLightScale(){
+        light.setLightScale(light.getLightScale() + 0.1f);
+        lightPower.setText(String.format("%1f", light.getLightScale()));
+
+    }
+
+    @FXML
+    private void deLightScale(){
+        light.setLightScale(light.getLightScale() - 0.1f);
+        lightPower.setText(String.format("%1f", light.getLightScale()));
+    }
+
+    @FXML
     private void initialize() {
         anchorPane.setStyle("-fx-background-color: gray");
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));

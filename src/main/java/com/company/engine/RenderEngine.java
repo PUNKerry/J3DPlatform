@@ -295,7 +295,7 @@ public class RenderEngine {
                     vn.normalize();
                     float opacity = vn.scalarProduct(toLight);
                     color = Color.rgb((int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-                            (int) (color.getBlue() * 255), calcOpacity(opacity, params.lightScale)); // 0.5 - 0.3 * opacity
+                            (int) (color.getBlue() * 255), calcOpacity(opacity, light.getLightScale())); // 0.5 - 0.3 * opacity
                 }
                 pw.setColor((int) o.x, (int) o.y, color);
             }
@@ -422,9 +422,9 @@ public class RenderEngine {
         }
         float val = scalarProduct * 0.7F;
         if (val >= 0) {
-            return center * (1 - val);
+            return (1 - center) * (1 - val);
         } else {
-            return center - (1 - center) * val;
+            return (1 - center) - center * val;
         }
     }
 }
